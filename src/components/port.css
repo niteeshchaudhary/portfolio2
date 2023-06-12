@@ -38,6 +38,9 @@
     margin: 0 auto;
     padding: 4rem 2rem;
   }
+
+
+
   .container-port {
     max-width: 100%;
     margin: 0 auto;
@@ -76,6 +79,8 @@
     text-anchor: middle;
     letter-spacing: 1px;
     font-weight: 600;
+    word-wrap: break-word;
+    -ms-word-wrap: break-word;
   }
   
   .svg-text {
@@ -116,6 +121,21 @@
     transform: translateZ(0);
   }
   
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg);
+      background-color: blue;
+    }
+    100% {
+      transform: rotate(360deg);
+      background-color: green;
+    }
+  }
+
   .item:hover circle,
   .item:hover image {
     transform: scale(1);

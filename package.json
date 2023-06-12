@@ -1,6 +1,7 @@
 {
   "name": "simpleportfolio",
   "version": "0.1.0",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@coreui/icons": "^3.0.1",
@@ -12,11 +13,9 @@
     "@testing-library/user-event": "^13.5.0",
     "emailjs-com": "^3.2.0",
     "jquery": "^3.7.0",
-    "node-sass": "^7.0.3",
-    "nodemailer": "^6.9.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^4.0.3",
     "typewriter-effect": "^2.20.1",
     "web-vitals": "^2.1.4"
   },
@@ -43,8 +42,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "sass": "^1.63.3"
   }
 }

@@ -1,12 +1,10 @@
 import "./Contact.css";
 import "./subbut.css";
 import $ from "jquery";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import emailjs from "emailjs-com";
 
 export default function Contact() {
-  const [showPopup, setShowPopup] = useState(true);
-
   useEffect(() => {
     $(".js-input").keyup(function () {
       if ($(this).val()) {
@@ -60,51 +58,51 @@ export default function Contact() {
 
   return (
     <div>
-      <section class="get-in-touchw" id="contact">
-        <h1 class="title">Get in touch</h1>
+      <section className="get-in-touchw" id="contact">
+        <h1 className="title">Get in touch</h1>
         <form
-          class="contact-formw roww"
+          className="contact-formw roww"
           onSubmit={sendEmail}
           // {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}
         >
-          <div class="form-field col x-50">
+          <div className="form-field col x-50">
             <input
               id="name"
-              class="input-text js-input"
+              className="input-text js-input"
               name="user_name"
               type="text"
               required
             />
-            <label class="label" for="name">
+            <label className="label" htmlFor="name">
               Name
             </label>
           </div>
-          <div class="form-field col x-50">
+          <div className="form-field col x-50">
             <input
               id="email"
-              class="input-text js-input"
+              className="input-text js-input"
               type="email"
               name="user_email"
               required
             />
-            <label class="label" for="email">
+            <label className="label" htmlFor="email">
               E-mail
             </label>
           </div>
-          <div class="form-field col x-100">
+          <div className="form-field col x-100">
             <textarea
               id="message"
-              class="input-area js-input"
+              className="input-area js-input"
               type="text"
               name="message"
               required
             />
-            <label class="label2" for="message">
+            <label className="label2" htmlFor="message">
               Message
             </label>
           </div>
 
-          <div class="form-field col x-100 align-centerw">
+          <div className="form-field col x-100 align-centerw">
             {/*  */}
             <input
               style={{ display: "none" }}
@@ -114,25 +112,25 @@ export default function Contact() {
             />
             <div id="button-wrapper">
               <a
-                class="submit"
+                className="submit"
                 onClick={() => document.getElementById("submitcontact").click()}
               >
                 Send
               </a>
-              <div class="loader-wrapper">
-                <span class="loader yellow"></span>
-                <span class="loader pink"></span>
+              <div className="loader-wrapper">
+                <span className="loader yellow"></span>
+                <span className="loader pink"></span>
               </div>
-              <span class="loader orange"></span>
+              <span className="loader orange"></span>
 
-              <div class="check-wrapper">
+              <div className="check-wrapper">
                 <svg
                   version="1.1"
                   width="65px"
                   height="38px"
                   viewBox="0 0 64.5 37.4"
                 >
-                  <polyline class="check" points="5,13 21.8,32.4 59.5,5 " />
+                  <polyline className="check" points="5,13 21.8,32.4 59.5,5 " />
                 </svg>
               </div>
             </div>
@@ -162,10 +160,10 @@ export default function Contact() {
         </form>
       </section>
 
-      {/* <p class="note">
+      {/* <p className="note">
         Based on{" "}
         <a
-          class="link"
+          className="link"
           href="http://redcollar.digital/contacts/"
           target="blank"
         >

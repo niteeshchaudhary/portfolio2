@@ -66,7 +66,9 @@
       width: 100%;
       height: 36px;
       border-width: 0 0 2px 0;
-      border-color: #000;
+      border-color: var(--borderc);
+      color: var(--borderc);
+      background-color: var(--backc);
       font-family: Lusitana, serif;
       font-size: 18px;
       line-height: 26px;
@@ -88,7 +90,9 @@
     width: 100%;
     height: 8rem;
     border-width: 0 0 2px 0;
-    border-color: #000;
+    color: var(--borderc);
+    background-color: var(--backc);
+    border-color: var(--borderc);
     font-family: Lusitana, serif;
     font-size: 18px;
     line-height: 26px;
@@ -113,7 +117,7 @@
       font-size: 18px;
       line-height: 26px;
       font-weight: 400;
-      color: #888;
+      color: var(--labelc);
       cursor: text;
       transition: transform .2s ease-in-out;
    }
@@ -125,15 +129,15 @@
     font-size: 18px;
     line-height: 26px;
     font-weight: 400;
-    color: #888;
+    color: var(--labelc);
     cursor: text;
     transition: transform .2s ease-in-out;
  }
    
    .submit-btn {
       display: inline-block;
-      background-color: #000;
-      color: #fff;
+      background-color: var(--borderc);
+      color: var(--fontc);
       font-family: Raleway, sans-serif;
       text-transform: uppercase;
       letter-spacing: 2px;
@@ -147,8 +151,8 @@
 
 @media screen and (max-width: 580px){
 	.get-in-touchw  {
-		margin-top: 12rem;
-        margin-bottom: 25rem;
+		margin-top: 14rem;
+        margin-bottom: 35rem;
 	}
   }
 

@@ -10,7 +10,6 @@ export default function Navbar() {
   };
   function toggleClass2(element, stringClass) {
     var elems = document.getElementsByClassName("nav__list-item");
-    console.log(elems.length);
     for (var i = 0; i < elems.length; i++) {
       if (elems[i].classList.contains(stringClass)) {
         elems[i].classList.remove(stringClass);
@@ -26,7 +25,6 @@ export default function Navbar() {
       sections.forEach((section) => {
         const sectionTop = section.offsetTop;
         const sectionHeight = section.clientHeight;
-        console.log(section.id, sectionTop, sectionHeight);
         if (
           scrollPosition >= sectionTop - 300 &&
           scrollPosition < sectionTop + sectionHeight - 300

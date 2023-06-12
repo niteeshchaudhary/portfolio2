@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import Skills from "./components/Skills";
 import Footer from "./components/Footer";

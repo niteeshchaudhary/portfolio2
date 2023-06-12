@@ -3,7 +3,6 @@ import Typewriter from "typewriter-effect";
 import { useEffect } from "react";
 import "./Menu.css";
 import "./CursorEffect.css";
-import { useState } from "react";
 export default function CursorEffect() {
   var toggleClass = function toggleClass(element, stringClass) {
     if (element.classList.contains(stringClass))
