@@ -1,0 +1,68 @@
+[
+  {
+    "name": "C",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "90",
+    "certificates": "50"
+  },
+  {
+    "name": "C++",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "85",
+    "certificates": "50"
+  },
+  {
+    "name": "Java",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "95",
+    "certificates": "50"
+  },
+  {
+    "name": "Python",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "90",
+    "certificates": "50"
+  },
+  {
+    "name": "Js",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "80",
+    "certificates": "50"
+  },
+  {
+    "name": "Node js",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "70",
+    "certificates": "50"
+  },
+  {
+    "name": "React",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "75",
+    "certificates": "50"
+  },
+  {
+    "name": "Django",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "60",
+    "certificates": "50"
+  },
+  {
+    "name": "Android",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "65",
+    "certificates": "50"
+  },
+  {
+    "name": "MsSql",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "85",
+    "certificates": "50"
+  },
+  {
+    "name": "MongoDB",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+    "percentage": "50",
+    "certificates": "50"
+  }
+]

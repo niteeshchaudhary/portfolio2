@@ -1,0 +1,175 @@
+p {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    text-align: center;
+    padding-top: 30px;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  .brand {
+    text-align: center;
+  }
+  
+  .brand img {
+    width: 50px;
+  }
+  
+  .p1:hover, .p2:hover {
+      opacity: .3;
+    cursor: pointer;
+  }
+  
+  h4 {
+      color: grey;
+      font-size: 24px;
+      font-weight: 400;
+  }
+  
+  #portfolio p {
+      color: grey;
+      font-size: 12px;
+      font-weight: 200;
+  }
+  
+  .content {
+      width: 100%;
+      margin: 0 auto;
+      padding: 0px;
+      text-align: center;
+  }
+  
+  .single-content img {
+      width: 290px;
+      height: 100%;
+      margin: 10px;
+  }
+  
+  .filters {
+      width: 100%;
+      text-align: center;
+  }
+  
+  ul {
+      list-style: none;
+      padding: 20px 0;
+  }
+  
+  li {
+      display: inline;
+      padding: 10px 25px;
+      font-size: 14px;
+      color: #636363;
+      font-weight: 400;
+      cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: .2em;
+  }
+  
+  li:hover {
+      color: #a6a6a6;
+  }
+  
+  li.active {
+      color: #ccc;
+      border: 1px solid #ccc;
+      border-radius: 15px;
+  }
+
+
+  
+#skills {
+	padding: 100px 0 100px 0;
+	background-color: var(--lighttrans);
+}
+.progressBar {
+	margin-bottom: 26px;
+	margin-bottom: 1.66em;
+}
+.progressBar h4 {
+	font-size: 16px;
+	text-transform: none;
+	margin-bottom: 7px;
+	margin-bottom: .33em;
+}
+.progressBarContainer {
+	width: 100%;
+	height: 8px;
+	background: #E1E1E1;
+	overflow: hidden;
+}
+.progressBarValue {
+	height: 8px;
+	float: left;
+	background: #e55d87; /* Old browsers */
+	background: -moz-linear-gradient(-45deg, #9a08ef 20%, #1109f7 60%, #f00505 100%);
+	background: -webkit-linear-gradient(-45deg, #9a08ef 20%, #1109f7 60%, #f00505 100%);
+	background: linear-gradient(135deg, #9a08ef 20%, #1109f7 60%, #f005e0 100%);
+}
+.value-00 {
+	width: 0;
+}
+.value-05 {
+	width: 5%;
+}
+.value-10 {
+	width: 10%;
+}
+.value-15 {
+	width: 15%;
+}
+.value-20 {
+	width: 20%;
+}
+.value-25 {
+	width: 25%;
+}
+.value-30 {
+	width: 30%;
+}
+.value-35 {
+	width: 35%;
+}
+.value-40 {
+	width: 40%;
+}
+.value-45 {
+	width: 45%;
+}
+.value-50 {
+	width: 50%;
+}
+.value-55 {
+	width: 55%;
+}
+.value-60 {
+	width: 60%;
+}
+.value-65 {
+	width: 65%;
+}
+.value-70 {
+	width: 70%;
+}
+.value-75 {
+	width: 75%;
+}
+.value-80 {
+	width: 80%;
+}
+.value-85 {
+	width: 85%;
+}
+.value-90 {
+	width: 90%;
+}
+.value-95 {
+	width: 95%;
+}
+.value-100 {
+	width: 100%;
+}
+

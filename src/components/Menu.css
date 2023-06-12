@@ -1,0 +1,64 @@
+:root{
+--mainfont: 'Raleway', sans-serif;
+--bglight: #EEE;
+--lighttrans:#f5f5f574;
+--bgdark: #222;
+--itemcolor: #000;
+--itemhover: #EEE;
+--menuheight: --menulineheight * 5;
+--menuleft: 50px;
+--menufontsize: 50px;
+--menulineheight: --menufontsize;
+--menutexttransform: lowercase;
+--cursorColor:rgba(255, 255, 255, 0.6);
+--grsc:0;
+--blr:6px;
+--hue:90deg;
+--ct:150%;
+}
+.dark{
+  --lighttrans:#00000000;
+  --cursorColor:rgba(255, 255, 255, 0.6);
+  --grsc:90%;
+  --blr:6px;
+  --hue:0deg;
+  --ct:150%;
+}
+
+body {
+  &, * {
+    transition: all 300ms ease-out;
+  }
+  &.light {
+	  background-color: var(--bglight);
+  }
+  &.dark {
+	  background-color: var(--bgdark);
+  }
+}
+
+.menu {
+  position: absolute;
+  height: var(--menuheight);
+  top: 50%;
+  margin-top: -(var(--menuheight / 2));
+  width: auto;
+  margin-left: var(--menuleft);
+  
+}
+li {
+  color: var(--itemcolor);
+  list-style-type: none;
+  line-height: var(--menulineheight);
+  font-family: var(--mainfont);
+  font-size: var(--menufontsize);
+  text-transform: var(--menutexttransform);
+  
+}
+li:hover {
+  color: var(--itemhover);
+  cursor: pointer;
+}
+
+
+
