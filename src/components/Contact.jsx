@@ -38,22 +38,29 @@ export default function Contact() {
       .then(
         (result) => {
           console.log(result.text);
-          emailjs.sendForm(
-            "service_j9ovyx9",
-            "template_rn5puj8",
-            e.target,
-            "qzrCzPgtdSbiIJl6v"
-          );
+          emailjs
+            .sendForm(
+              "service_j9ovyx9",
+              "template_rn5puj8",
+              e.target,
+              "qzrCzPgtdSbiIJl6v"
+            )
+            .then((rs) => {
+              console.log("HI", rs);
+              var ele = document.getElementsByClassName("input-text");
+              for (var i = 0; i < ele.length; i++) {
+                ele[i].value = "";
+              }
+              ele = document.getElementsByClassName("input-area");
+              for (i = 0; i < ele.length; i++) {
+                ele[i].value = "";
+              }
+            });
         },
         (error) => {
           console.log(error.text);
         }
       );
-
-    var ele = document.getElementsByClassName("input-text");
-    for (var i = 0; i < ele.length; i++) {
-      ele[i].value = "";
-    }
   }
 
   return (

@@ -5,10 +5,12 @@ p {
     text-align: center;
     padding-top: 30px;
   }
+
   
   a {
     text-decoration: none;
   }
+
   
   .brand {
     text-align: center;
@@ -24,9 +26,9 @@ p {
   }
   
   h4 {
-      color: grey;
+      color: black;
       font-size: 24px;
-      font-weight: 400;
+      font-weight: 900;
   }
   
   #portfolio p {

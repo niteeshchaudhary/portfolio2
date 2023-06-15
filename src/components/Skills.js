@@ -5,7 +5,7 @@ export default function Skills() {
     <>
       <section id="skills">
         <div className="container">
-          <h1 style={{ color: "blue" }}>Skills</h1>
+          <h1 style={{ color: "blue", marginBottom: "3rem" }}>Skills</h1>
           <div className="block"></div>
           <div className="row" key={1}>
             {/* <div className="one-third column">
