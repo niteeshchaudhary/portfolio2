@@ -104,24 +104,31 @@ export default function Portfolioview() {
                     preserveAspectRatio="xMinYMin slice"
                     width="100%"
                     className="dull-image"
-                    xlinkHref={ele.thumb}
+                    xlinkHref={ele?.thumb}
                   ></image>
                   <text className="svg-masked-text" dy=".3em" x="50%" y="50%">
-                    {ele.name}
+                    {ele?.name}
                   </text>
                   {/* <text className="svg-text" dy=".3em" x="50%" y="50%">
                 Worms
               </text> */}
                   <g clipPath={`url(#clip-${index + 1})`}>
-                    <image
-                      height="100%"
-                      preserveAspectRatio="xMinYMin slice"
-                      width="100%"
-                      xlinkHref={ele.thumb}
-                    ></image>
-                    <text className="svg-masked-text" dy=".3em" x="50%" y="50%">
-                      {ele.name}
-                    </text>
+                    <a href={ele?.link}>
+                      <image
+                        height="100%"
+                        preserveAspectRatio="xMinYMin slice"
+                        width="100%"
+                        xlinkHref={ele?.thumb}
+                      ></image>
+                      <text
+                        className="svg-masked-text"
+                        dy=".3em"
+                        x="50%"
+                        y="50%"
+                      >
+                        {ele?.name}
+                      </text>
+                    </a>
                   </g>
                 </svg>
               </div>

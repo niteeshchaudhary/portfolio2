@@ -116,11 +116,29 @@ a:hover {
 	letter-spacing: 2px;
 	color: #fff;
 	transition : all 0.3s ease-out;
+	background:var(--logocolor);
+	box-shadow: 0px 0px 20px 20px var(--logocolor);
+
 }
+
 .logo-wrap a span{ 
     background: linear-gradient(to right, rgb(209, 22, 226), blue); /* Define your gradient here */
-    -webkit-background-clip: text;
+	-webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+	animation: animatedgradient 3s ease alternate infinite;
+	background-size: 200% 200%;
+
+}
+@keyframes animatedgradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
 }
 .logo-wrap a:hover {
 	opacity: 0.9;
@@ -556,19 +574,36 @@ body.light .switch-wrap p span:nth-child(1):before {
     box-shadow: 0 0 0 20px rgba(255,255,255,.1);
 }
 
-
-
-
 .writer-effect{ 
     font-family: 'Times New Roman', Times, serif;
-    font-size: 8rem;
-    background: linear-gradient(to bottom, rgb(209, 22, 226), blue,rgb(255, 0, 166)); /* Define your gradient here */
+    font-size: 6em;
+    background: linear-gradient(135deg, #f79533, #e7350d, #f30d4e, #a166ab, #276bf4, #0cb2cc, #40e659, #02ff41);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+	animation: animatedgradient 3s ease alternate infinite;
+	background-size: 150% 150%;
 }
+@media screen and (max-height: 550px){
+	.writer-effect {
+		font-size: 2em;
+	}
+	.logo-wrap a {
+		cursor: pointer;
+	/*	font-family: 'Montserrat', sans-serif;*/
+		font-family:"Monotype Corsiva";
+		font-weight: 900;
+		font-size: 13px;
+		line-height: 20px;
+		text-transform: uppercase;
+		letter-spacing: 1.5px;
+		color: #fff;
+		transition : all 0.3s ease-out;
+		
+	}
+  }
 @media screen and (max-width: 580px){
 	.writer-effect {
-		font-size: 4rem;
+		font-size: 3em;
 	}
 	.logo-wrap a {
 		cursor: pointer;

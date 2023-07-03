@@ -18,19 +18,26 @@
 --ct:150%;
 --labelc:#888;
 --backc:#fff;
+--backblk:#fff;
+--backborder:#e6e6e6;
+--rolecolor:#374054;
 --fontc:#fff;
+--logocolor:#fff;
 }
 .dark{
   --lighttrans:#00000000;
+  --rolecolor:#bdceeb;
   --borderc:#fff;
   --cursorColor:rgba(255, 255, 255, 0.6);
   --grsc:90%;
   --blr:6px;
   --hue:0deg;
   --ct:150%;
+  --backblk:#000;
   --labelc:#ccc;
   --fontc:#000;
   --backc:#232222a8;
+  --logocolor:#222;
 }
 
 body {

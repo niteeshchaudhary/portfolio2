@@ -110,6 +110,8 @@ p {
 	background: -moz-linear-gradient(-45deg, #9a08ef 20%, #1109f7 60%, #f00505 100%);
 	background: -webkit-linear-gradient(-45deg, #9a08ef 20%, #1109f7 60%, #f00505 100%);
 	background: linear-gradient(135deg, #9a08ef 20%, #1109f7 60%, #f005e0 100%);
+  animation: animatedgradient 3s ease alternate infinite;
+	background-size: 500% 500%;
 }
 .value-00 {
 	width: 0;

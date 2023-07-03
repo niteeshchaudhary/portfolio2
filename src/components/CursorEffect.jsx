@@ -10,7 +10,6 @@ export default function CursorEffect() {
     else element.classList.add(stringClass);
   };
 
-
   function switchClicked() {
     console.log(jQuery("body").hasClass("light"));
     if (jQuery("body").hasClass("light")) {
@@ -62,7 +61,7 @@ export default function CursorEffect() {
         <div className="header-wrapper">
           <div className="logo-wrap">
             <a href="#" className="hover-target">
-              <span>Niteesh Kamal Chaudhary</span>
+              <span>Niteesh Kamal Chaudhary &nbsp;</span>
             </a>
           </div>
           <div className="nav-but-wrap">

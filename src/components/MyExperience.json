@@ -1,0 +1,23 @@
+[
+  {
+    "time": "Aug 2022 - April 2023",
+    "role": "Technical Team Member",
+    "Company": "Technical Team Member",
+    "image": "https://media.licdn.com/dms/image/C560BAQF9b79KpugRnA/company-logo_100_100/0/1599027076074?e=1696464000&v=beta&t=4Nqpb6u4D9h5EBTZlJDAC5Udk8CPcXFD6_99XhKgmbU",
+    "Discription": "Devlopment and maintainance of CDC website. Skills:  Django REST Framework · React.js · SQL · Programming · Django · HTML"
+  },
+  {
+    "time": "January 2022 - July 2022",
+    "role": "FullStack Developer",
+    "Company": "Crony Technovest",
+    "image": "https://media.licdn.com/dms/image/C4D0BAQHm_oPd-nvNxQ/company-logo_200_200/0/1615986516526?e=1694649600&v=beta&t=XfI8EQ1vXZ4g4xzc2PnslM6IPawgdIqviNGRcUdmfJI",
+    "Discription": "Devloped Api's, Written Cloud functions using Nodejs in Firebase.\n\r Developed Front End Screens using React."
+  },
+  {
+    "time": "Dec 2021 - Jan 2022",
+    "role": "AI Intern",
+    "Company": "InMovidu Technologies",
+    "image": "https://pbs.twimg.com/profile_images/902062688796270593/MmCFSDUT_400x400.jpg",
+    "Discription": "It was Internship program based on Artificial Intelligence with Python. Worked on libraries like NLTK, tensorflow, pytorchIt was Internship program based on Artificial Intelligence with Python. Worked on libraries like NLTK, tensorflow, pytorch.\n Skills: PyTorch · NLTK · Natural Language Processing (NLP) · TensorFlow · Programming"
+  }
+]
