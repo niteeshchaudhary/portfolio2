@@ -42,9 +42,9 @@
     "dir": "07"
   },
   {
-    "name": "Cafe Booking",
-    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot8.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
-    "link": "",
+    "name": "Wordle Solver",
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/3.png?alt=media&token=02c34e60-8406-4f0f-95ce-8b44ffcd909f",
+    "link": "https://github.com/niteeshchaudhary/WordleSolver",
     "dir": "08"
   },
   {
@@ -56,7 +56,7 @@
   {
     "name": "Bricks and Ball",
     "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot11.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
-    "link": "",
+    "link": "https://github.com/niteeshchaudhary/bricksandball",
     "dir": "11"
   },
   {
