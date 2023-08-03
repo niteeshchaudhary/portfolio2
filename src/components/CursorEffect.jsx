@@ -56,6 +56,9 @@ export default function CursorEffect() {
       t.addEventListener("mouseover", n);
       t.addEventListener("mouseout", s);
     }
+    if (localStorage.getItem("theme") === "dark") {
+      jQuery("#switch").addClass("switched");
+    }
   }, []);
   return (
     <>

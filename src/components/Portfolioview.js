@@ -1,10 +1,27 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./port.css";
 import firstbox from "../ss/Screenshot1.png";
 import pro from "./projects.json";
+import { getDatabase, ref, child, get } from "firebase/database";
 
 export default function Portfolioview() {
+  const [data, setData] = useState([]);
+
   useEffect(() => {
+    // Create a reference to the Firebase Realtime Database
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `projects`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(snapshot.val());
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
     var items = [],
       point = document.querySelector("svg").createSVGPoint();
 
@@ -59,6 +76,46 @@ export default function Portfolioview() {
         button.addEventListener("click", changeColor);
       });
   }, []);
+
+  const display = (ele, index) => {
+    return (
+      <div className="item" key={"ele" + (index + 1)}>
+        <svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 300 200">
+          <defs>
+            <clipPath id={"clip-" + (index + 1)}>
+              <circle cx="0" cy="0" fill="#000" r="150px"></circle>
+            </clipPath>
+          </defs>
+          <image
+            height="100%"
+            preserveAspectRatio="xMinYMin slice"
+            width="100%"
+            className="dull-image"
+            xlinkHref={ele?.thumb}
+          ></image>
+          <text className="svg-masked-text" dy=".3em" x="50%" y="50%">
+            {ele?.name}
+          </text>
+          {/* <text className="svg-text" dy=".3em" x="50%" y="50%">
+        Worms
+      </text> */}
+          <g clipPath={`url(#clip-${index + 1})`}>
+            <a href={ele?.link} target="blank">
+              <image
+                height="100%"
+                preserveAspectRatio="xMinYMin slice"
+                width="100%"
+                xlinkHref={ele?.thumb}
+              ></image>
+              <text className="svg-masked-text" dy=".3em" x="50%" y="50%">
+                {ele?.name}
+              </text>
+            </a>
+          </g>
+        </svg>
+      </div>
+    );
+  };
   return (
     <section className="container-port" id="work">
       <header>
@@ -90,50 +147,9 @@ export default function Portfolioview() {
               </g>
             </svg>
           </div>
-          {pro.map((ele, index) => {
-            return (
-              <div className="item" key={"ele" + (index + 1)}>
-                <svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 300 200">
-                  <defs>
-                    <clipPath id={"clip-" + (index + 1)}>
-                      <circle cx="0" cy="0" fill="#000" r="150px"></circle>
-                    </clipPath>
-                  </defs>
-                  <image
-                    height="100%"
-                    preserveAspectRatio="xMinYMin slice"
-                    width="100%"
-                    className="dull-image"
-                    xlinkHref={ele?.thumb}
-                  ></image>
-                  <text className="svg-masked-text" dy=".3em" x="50%" y="50%">
-                    {ele?.name}
-                  </text>
-                  {/* <text className="svg-text" dy=".3em" x="50%" y="50%">
-                Worms
-              </text> */}
-                  <g clipPath={`url(#clip-${index + 1})`}>
-                    <a href={ele?.link} target="blank">
-                      <image
-                        height="100%"
-                        preserveAspectRatio="xMinYMin slice"
-                        width="100%"
-                        xlinkHref={ele?.thumb}
-                      ></image>
-                      <text
-                        className="svg-masked-text"
-                        dy=".3em"
-                        x="50%"
-                        y="50%"
-                      >
-                        {ele?.name}
-                      </text>
-                    </a>
-                  </g>
-                </svg>
-              </div>
-            );
-          })}
+          {data
+            ? data.map((ele, index) => display(ele, index))
+            : pro.map((ele, index) => display(ele, index))}
         </div>
       </main>
     </section>

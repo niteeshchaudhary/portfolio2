@@ -3,7 +3,6 @@
     {
       "name": "C",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
-      
       "percentage": "90",
       "certificates": "50"
     },
@@ -70,74 +69,99 @@
   ],
   "projects": [
     {
-      "name": "Sales",
+      "name": "Online Shoping",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot1.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/ShoppingAppC",
       "dir": "01"
     },
     {
-      "name": "2",
+      "name": "Lucky Gold",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot2.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/LuckyGold",
       "dir": "02"
     },
     {
-      "name": "3",
+      "name": "Parsec Funds",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot3.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/parsecfunds",
       "dir": "03"
     },
     {
-      "name": "4",
+      "name": "Ludo",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot4.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/ludo",
       "dir": "04"
     },
     {
-      "name": "5",
+      "name": "Music Player",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot5.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/MusicSystem",
       "dir": "05"
     },
     {
-      "name": "6",
+      "name": "Turn Tiles",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot6.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/TurnTiles",
       "dir": "06"
     },
     {
-      "name": "7",
+      "name": "IDE- C,Cpp,Java",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot7.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/IDE_C_cpp_java",
       "dir": "07"
     },
     {
-      "name": "8",
-      "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot8.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "name": "Wordle Solver",
+      "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/3.png?alt=media&token=02c34e60-8406-4f0f-95ce-8b44ffcd909f",
+      "link": "https://github.com/niteeshchaudhary/WordleSolver",
       "dir": "08"
     },
     {
-      "name": "9",
-      "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot9.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
-      "dir": "09"
-    },
-    {
-      "name": "10",
+      "name": "Chit Chat",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot10.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/ChattingAppjava",
       "dir": "10"
     },
     {
-      "name": "11",
+      "name": "Bricks and Ball",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot11.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/bricksandball",
       "dir": "11"
     },
     {
-      "name": "12",
-      "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot12.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
-      "dir": "12"
-    },
-    {
-      "name": "13",
+      "name": "MineSweep Ai",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot13.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/minesweeper",
       "dir": "13"
     },
     {
-      "name": "14",
+      "name": "NKC Paint",
       "thumb": "https://firebasestorage.googleapis.com/v0/b/portfolio-5712a.appspot.com/o/Screenshot14.png?alt=media&token=762885ef-d562-4df0-be8b-ccd600a773ec&_gl=1*wh7jh2*_ga*MjA5Njg1MzU1My4xNjgzMzU5MDcz*_ga_CW55HF8NVT*MTY4NjU1NjQzMi41LjEuMTY4NjU1NjY4OC4wLjAuMA..",
+      "link": "https://github.com/niteeshchaudhary/Paint-App-Java",
       "dir": "14"
+    }
+  ],
+  "experience": [
+    {
+      "time": "Aug 2022 - April 2023",
+      "role": "Technical Team Member",
+      "Company": "CDC IITdh",
+      "image": "https://media.licdn.com/dms/image/C560BAQF9b79KpugRnA/company-logo_100_100/0/1599027076074?e=1696464000&v=beta&t=4Nqpb6u4D9h5EBTZlJDAC5Udk8CPcXFD6_99XhKgmbU",
+      "Discription": "Devlopment and maintainance of CDC website. Skills:  Django REST Framework · React.js · SQL · Programming · Django · HTML"
+    },
+    {
+      "time": "January 2022 - July 2022",
+      "role": "FullStack Developer",
+      "Company": "Crony Technovest",
+      "image": "https://media.licdn.com/dms/image/C4D0BAQHm_oPd-nvNxQ/company-logo_200_200/0/1615986516526?e=1694649600&v=beta&t=XfI8EQ1vXZ4g4xzc2PnslM6IPawgdIqviNGRcUdmfJI",
+      "Discription": "Devloped Api's, Written Cloud functions using Nodejs in Firebase.\n\r Developed Front End Screens using React."
+    },
+    {
+      "time": "Dec 2021 - Jan 2022",
+      "role": "AI Intern",
+      "Company": "InMovidu Technologies",
+      "image": "https://pbs.twimg.com/profile_images/902062688796270593/MmCFSDUT_400x400.jpg",
+      "Discription": "It was Internship program based on Artificial Intelligence with Python. Worked on libraries like NLTK, tensorflow, pytorchIt was Internship program based on Artificial Intelligence with Python. Worked on libraries like NLTK, tensorflow, pytorch.\n Skills: PyTorch · NLTK · Natural Language Processing (NLP) · TensorFlow · Programming"
     }
   ]
 }
