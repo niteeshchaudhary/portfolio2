@@ -113,7 +113,7 @@ export default function Portfolioview() {
                 Worms
               </text> */}
                   <g clipPath={`url(#clip-${index + 1})`}>
-                    <a href={ele?.link}>
+                    <a href={ele?.link} target="blank">
                       <image
                         height="100%"
                         preserveAspectRatio="xMinYMin slice"

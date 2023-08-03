@@ -14,9 +14,11 @@ export default function CursorEffect() {
     console.log(jQuery("body").hasClass("light"));
     if (jQuery("body").hasClass("light")) {
       jQuery("body").addClass("dark").removeClass("light");
+      localStorage.setItem("theme", "dark");
       jQuery("#switch").addClass("switched");
     } else if (jQuery("body").hasClass("dark")) {
       jQuery("body").addClass("light").removeClass("dark");
+      localStorage.setItem("theme", "light");
       jQuery("#switch").removeClass("switched");
     }
   }
