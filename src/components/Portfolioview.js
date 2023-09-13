@@ -83,7 +83,7 @@ export default function Portfolioview() {
         <svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 300 200">
           <defs>
             <clipPath id={"clip-" + (index + 1)}>
-              <circle cx="0" cy="0" fill="#000" r="150px"></circle>
+              <circle cx="50%" cy="50%" fill="#000" r="150px"></circle>
             </clipPath>
           </defs>
           <image
