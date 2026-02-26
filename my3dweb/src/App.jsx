@@ -10,22 +10,40 @@ function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
 
-function NavDots({ section, onNavigate, is3D, isContentOpen }) {
-  if (!is3D || isContentOpen) return null;
-  const labels = ['Welcome', 'Skills', 'Experience', 'Projects', 'Contact'];
+const SECTION_NAMES = ['Welcome', 'Skills', 'Experience', 'Projects', 'Contact'];
+
+function GameHUD({ section, isContentOpen, is3D }) {
+  if (!is3D) return null;
   return (
-    <nav className="nav-dots">
-      {labels.map((label, i) => (
-        <button
-          key={i}
-          className={`nav-dot ${section === i ? 'active' : ''}`}
-          onClick={() => onNavigate(i)}
-          aria-label={label}
-        >
-          <span className="dot-label">{label}</span>
-        </button>
-      ))}
-    </nav>
+    <div className="game-hud">
+      {/* Crosshair — hidden when content is open */}
+      {!isContentOpen && <div className="crosshair" />}
+
+      {/* Objective — top left */}
+      {!isContentOpen && (
+        <div className="hud-objective">
+          <span className="hud-label">OBJECTIVE</span>
+          <span className="hud-value">{SECTION_NAMES[section]}</span>
+        </div>
+      )}
+
+      {/* Progress tracker — bottom left */}
+      <div className={`hud-progress ${isContentOpen ? 'dim' : ''}`}>
+        {SECTION_NAMES.map((name, i) => (
+          <div key={i} className={`hud-step ${section >= i ? 'reached' : ''} ${section === i ? 'current' : ''}`}>
+            <div className="hud-step-dot" />
+            <span className="hud-step-label">{name}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Scroll prompt — center bottom, when on block and content not open */}
+      {!isContentOpen && (
+        <div className="hud-prompt">
+          <span>Scroll picked up — opening...</span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -49,10 +67,6 @@ export default function App() {
   const touchStartY = useRef(0);
   const openTimerRef = useRef(null);
 
-  const navigateToSection = useCallback((index) => {
-    scrollTarget.current = index / 4;
-  }, []);
-
   const handleCloseContent = useCallback(() => {
     setIsContentOpen(false);
   }, []);
@@ -67,33 +81,28 @@ export default function App() {
     return () => clearTimeout(openTimerRef.current);
   }, [activeSection]);
 
-  // Scroll / input handling — only active when content is CLOSED and in 3D mode
+  // Scroll input — only when content is CLOSED and in 3D mode
   useEffect(() => {
     if (!is3D || isContentOpen) return;
 
     const onWheel = (e) => {
       e.preventDefault();
-      scrollTarget.current = clamp(scrollTarget.current + e.deltaY * 0.00035, 0, 1);
+      scrollTarget.current = clamp(scrollTarget.current + e.deltaY * 0.0004, 0, 1);
     };
-
-    const onTouchStart = (e) => {
-      touchStartY.current = e.touches[0].clientY;
-    };
-
+    const onTouchStart = (e) => { touchStartY.current = e.touches[0].clientY; };
     const onTouchMove = (e) => {
       e.preventDefault();
-      const delta = touchStartY.current - e.touches[0].clientY;
+      const d = touchStartY.current - e.touches[0].clientY;
       touchStartY.current = e.touches[0].clientY;
-      scrollTarget.current = clamp(scrollTarget.current + delta * 0.002, 0, 1);
+      scrollTarget.current = clamp(scrollTarget.current + d * 0.002, 0, 1);
     };
-
     const onKeyDown = (e) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current + 0.05, 0, 1);
+        scrollTarget.current = clamp(scrollTarget.current + 0.06, 0, 1);
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current - 0.05, 0, 1);
+        scrollTarget.current = clamp(scrollTarget.current - 0.06, 0, 1);
       }
     };
 
@@ -101,7 +110,6 @@ export default function App() {
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('keydown', onKeyDown);
-
     return () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('touchstart', onTouchStart);
@@ -110,12 +118,10 @@ export default function App() {
     };
   }, [is3D, isContentOpen]);
 
-  // Allow Escape key to close content
+  // Escape key to close content
   useEffect(() => {
     if (!isContentOpen) return;
-    const onKey = (e) => {
-      if (e.key === 'Escape') setIsContentOpen(false);
-    };
+    const onKey = (e) => { if (e.key === 'Escape') setIsContentOpen(false); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [isContentOpen]);
@@ -141,17 +147,12 @@ export default function App() {
             projects={projects}
             experience={experience}
           />
+          <GameHUD section={activeSection} isContentOpen={isContentOpen} is3D={is3D} />
         </>
       ) : (
         <View2D skills={skills} projects={projects} experience={experience} />
       )}
 
-      <NavDots
-        section={activeSection}
-        onNavigate={navigateToSection}
-        is3D={is3D}
-        isContentOpen={isContentOpen}
-      />
       <ViewToggle is3D={is3D} onToggle={() => setIs3D(prev => !prev)} />
 
       <header className="site-header">

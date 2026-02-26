@@ -161,10 +161,10 @@ function ContactSection() {
 export default function ContentOverlay({ section, isOpen, onClose, skills, projects, experience }) {
   return (
     <div className={`content-fullpage ${isOpen ? 'open' : ''}`}>
-      {/* Close button */}
+      {/* Close button — top center */}
       <button className="content-close" onClick={onClose} aria-label="Close scroll">
         <span className="close-icon">✕</span>
-        <span className="close-label">Close Scroll</span>
+        <span className="close-label">CLOSE SCROLL</span>
       </button>
 
       {/* Hint at the bottom */}

@@ -246,41 +246,45 @@
   visibility: visible;
 }
 
-/* Close button */
+/* Close button — TOP CENTER */
 .content-close {
   position: fixed;
-  top: 20px;
-  right: 80px;
-  z-index: 90;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 95;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: 6px;
+  background: rgba(200, 50, 50, 0.25);
+  border: 1px solid rgba(255, 80, 80, 0.4);
+  color: rgba(255, 200, 200, 0.9);
   cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .content-close:hover {
-  background: rgba(168, 85, 247, 0.2);
-  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(220, 60, 60, 0.4);
+  border-color: rgba(255, 100, 100, 0.6);
   color: white;
-  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 80, 80, 0.2);
 }
 
 .close-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1;
 }
 
 .close-label {
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 2px;
 }
 
 /* Scrollable content area */
@@ -1089,5 +1093,183 @@
 
   .v2d-skills-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   GAME HUD (first-person overlay)
+   ============================================ */
+.game-hud {
+  pointer-events: none;
+  z-index: 70;
+}
+
+/* --- CROSSHAIR --- */
+.crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  z-index: 70;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 1px;
+}
+
+.crosshair::before {
+  width: 2px;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.crosshair::after {
+  height: 2px;
+  width: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* --- OBJECTIVE (top-left) --- */
+.hud-objective {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.25);
+  text-transform: uppercase;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.hud-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+/* --- PROGRESS TRACKER (bottom-left) --- */
+.hud-progress {
+  position: fixed;
+  bottom: 30px;
+  left: 24px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.3s;
+}
+
+.hud-progress.dim {
+  opacity: 0.3;
+}
+
+.hud-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+  flex-shrink: 0;
+}
+
+.hud-step.reached .hud-step-dot {
+  background: rgba(168, 85, 247, 0.6);
+  border-color: rgba(168, 85, 247, 0.8);
+}
+
+.hud-step.current .hud-step-dot {
+  background: #a855f7;
+  border-color: #a855f7;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+  transform: scale(1.3);
+}
+
+.hud-step-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.15);
+  font-family: 'Space Grotesk', sans-serif;
+  transition: color 0.4s;
+}
+
+.hud-step.reached .hud-step-label {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.hud-step.current .hud-step-label {
+  color: rgba(168, 85, 247, 0.8);
+}
+
+/* --- SCROLL PROMPT (bottom center) --- */
+.hud-prompt {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  color: rgba(255, 215, 0, 0.4);
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  animation: pulse 2s ease infinite;
+}
+
+/* --- Speed lines during jumps (CSS vignette enhancement) --- */
+@supports (backdrop-filter: blur(1px)) {
+  .app::after {
+    background: radial-gradient(
+      ellipse at center,
+      transparent 50%,
+      rgba(0, 0, 0, 0.5) 85%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+  }
+}
+
+@media (max-width: 900px) {
+  .hud-step-label {
+    display: none;
+  }
+
+  .hud-objective {
+    left: 16px;
+    top: 16px;
+  }
+
+  .hud-progress {
+    left: 16px;
+    bottom: 20px;
+  }
+
+  .content-close .close-label {
+    display: none;
   }
 }
