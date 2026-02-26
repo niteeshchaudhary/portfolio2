@@ -246,45 +246,40 @@
   visibility: visible;
 }
 
-/* Close button — TOP CENTER */
+/* Circular close button — TOP CENTER */
 .content-close {
   position: fixed;
-  top: 16px;
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 95;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 24px;
-  border-radius: 6px;
-  background: rgba(200, 50, 50, 0.25);
-  border: 1px solid rgba(255, 80, 80, 0.4);
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(200, 50, 50, 0.3);
+  border: 2px solid rgba(255, 80, 80, 0.45);
   color: rgba(255, 200, 200, 0.9);
   cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  font-family: 'Space Grotesk', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 }
 
 .content-close:hover {
-  background: rgba(220, 60, 60, 0.4);
-  border-color: rgba(255, 100, 100, 0.6);
+  background: rgba(220, 60, 60, 0.5);
+  border-color: rgba(255, 100, 100, 0.7);
   color: white;
-  box-shadow: 0 0 20px rgba(255, 80, 80, 0.2);
+  box-shadow: 0 0 24px rgba(255, 80, 80, 0.3);
+  transform: translateX(-50%) scale(1.1);
 }
 
 .close-icon {
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.close-label {
-  font-size: 0.7rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  letter-spacing: 2px;
+  line-height: 1;
 }
 
 /* Scrollable content area */
@@ -1269,7 +1264,8 @@
     bottom: 20px;
   }
 
-  .content-close .close-label {
-    display: none;
+  .content-close {
+    width: 40px;
+    height: 40px;
   }
 }

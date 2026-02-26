@@ -57,6 +57,8 @@ function ViewToggle({ is3D, onToggle }) {
   );
 }
 
+const TOTAL_SECTIONS = 5;
+
 export default function App() {
   const { skills, projects, experience, loading } = useFirebaseData();
   const [is3D, setIs3D] = useState(true);
@@ -67,11 +69,16 @@ export default function App() {
   const touchStartY = useRef(0);
   const openTimerRef = useRef(null);
 
+  // Gating: tracks how far forward the player is allowed to go.
+  // After closing content on section N, the next section (N+1) is unlocked.
+  const unlockedRef = useRef(0);
+
   const handleCloseContent = useCallback(() => {
     setIsContentOpen(false);
-  }, []);
+    unlockedRef.current = Math.max(unlockedRef.current, activeSection + 1);
+  }, [activeSection]);
 
-  // Auto-open content when prince lands on a new section
+  // Auto-open content when player lands on a new section
   useEffect(() => {
     setIsContentOpen(false);
     clearTimeout(openTimerRef.current);
@@ -81,28 +88,35 @@ export default function App() {
     return () => clearTimeout(openTimerRef.current);
   }, [activeSection]);
 
-  // Scroll input — only when content is CLOSED and in 3D mode
+  // Scroll input — only when content is CLOSED and in 3D mode.
+  // Forward progress is clamped to the next unlocked section boundary.
   useEffect(() => {
     if (!is3D || isContentOpen) return;
 
+    const maxProgress = () => Math.min(unlockedRef.current / (TOTAL_SECTIONS - 1), 1);
+
     const onWheel = (e) => {
       e.preventDefault();
-      scrollTarget.current = clamp(scrollTarget.current + e.deltaY * 0.0004, 0, 1);
+      scrollTarget.current = clamp(
+        scrollTarget.current + e.deltaY * 0.0004,
+        0,
+        maxProgress(),
+      );
     };
     const onTouchStart = (e) => { touchStartY.current = e.touches[0].clientY; };
     const onTouchMove = (e) => {
       e.preventDefault();
       const d = touchStartY.current - e.touches[0].clientY;
       touchStartY.current = e.touches[0].clientY;
-      scrollTarget.current = clamp(scrollTarget.current + d * 0.002, 0, 1);
+      scrollTarget.current = clamp(scrollTarget.current + d * 0.002, 0, maxProgress());
     };
     const onKeyDown = (e) => {
       if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current + 0.06, 0, 1);
+        scrollTarget.current = clamp(scrollTarget.current + 0.06, 0, maxProgress());
       } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current - 0.06, 0, 1);
+        scrollTarget.current = clamp(scrollTarget.current - 0.06, 0, maxProgress());
       }
     };
 
