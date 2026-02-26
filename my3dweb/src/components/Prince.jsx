@@ -2,180 +2,430 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+const SKIN = '#B07A4B';
+const HAIR = '#1a1206';
+const VEST = '#3d2914';
+const VEST_INNER = '#5c3a1e';
+const PANTS = '#c9b18a';
+const SASH = '#8B1A1A';
+const WRAPS = '#6b4423';
+const BOOTS = '#2c1608';
+const METAL = '#8a7d6b';
+const BLADE = '#c0c0c0';
+
+function smoothStep(target, current, factor) {
+  return current + (target - current) * factor;
+}
+
 export default function Prince({ jumpProgress = 0 }) {
-  const groupRef = useRef();
-  const leftArmRef = useRef();
-  const rightArmRef = useRef();
-  const leftLegRef = useRef();
-  const rightLegRef = useRef();
-  const capeRef = useRef();
+  const spineRef = useRef();
+  const headRef = useRef();
+  const lShoulderRef = useRef();
+  const rShoulderRef = useRef();
+  const lElbowRef = useRef();
+  const rElbowRef = useRef();
+  const lHipRef = useRef();
+  const rHipRef = useRef();
+  const lKneeRef = useRef();
+  const rKneeRef = useRef();
+  const sashRef = useRef();
+  const hairRef = useRef();
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
-    if (!groupRef.current) return;
+    const jp = jumpProgress;
+    const isJumping = jp > 0.05 && jp < 0.95;
+    const jumpSin = Math.sin(jp * Math.PI);
 
-    // Idle bobbing
-    groupRef.current.position.y = Math.sin(t * 2) * 0.03;
+    // Jump phase detection
+    const crouch = jp > 0.02 && jp < 0.15;
+    const launch = jp >= 0.15 && jp < 0.3;
+    const air = jp >= 0.3 && jp < 0.7;
+    const descend = jp >= 0.7 && jp < 0.88;
+    const land = jp >= 0.88 && jp < 0.98;
 
-    // Arm swing
-    const swing = Math.sin(t * 3) * 0.2;
-    if (leftArmRef.current) leftArmRef.current.rotation.x = swing;
-    if (rightArmRef.current) rightArmRef.current.rotation.x = -swing;
+    // === SPINE (forward/back lean) ===
+    if (spineRef.current) {
+      let leanX = Math.sin(t * 0.8) * 0.015;
+      if (crouch) leanX = 0.35;
+      else if (launch) leanX = -0.2;
+      else if (air) leanX = 0.15 + Math.sin(t * 3) * 0.03;
+      else if (descend) leanX = 0.05;
+      else if (land) leanX = 0.4;
+      spineRef.current.rotation.x = smoothStep(leanX, spineRef.current.rotation.x, 0.08);
+    }
 
-    // Leg movement during jump
-    const legSwing = jumpProgress > 0.05 && jumpProgress < 0.95
-      ? Math.sin(t * 8) * 0.4
-      : 0;
-    if (leftLegRef.current) leftLegRef.current.rotation.x = legSwing;
-    if (rightLegRef.current) rightLegRef.current.rotation.x = -legSwing;
+    // === HEAD ===
+    if (headRef.current) {
+      let headTilt = Math.sin(t * 0.6) * 0.04;
+      if (launch) headTilt = -0.25;
+      else if (air) headTilt = 0.1;
+      else if (land) headTilt = 0.2;
+      headRef.current.rotation.x = smoothStep(headTilt, headRef.current.rotation.x, 0.06);
+      headRef.current.rotation.y = isJumping ? 0 : Math.sin(t * 0.4) * 0.08;
+    }
 
-    // Cape wave
-    if (capeRef.current) {
-      capeRef.current.rotation.x = -0.3 + Math.sin(t * 4) * 0.15;
-      capeRef.current.position.z = -0.12 + Math.sin(t * 3) * 0.02;
+    // === LEFT ARM ===
+    if (lShoulderRef.current) {
+      let angle;
+      if (crouch) angle = 0.6;
+      else if (launch) angle = -2.2;
+      else if (air) angle = -1.4 + Math.sin(t * 4) * 0.1;
+      else if (descend) angle = -0.5;
+      else if (land) angle = 1.0;
+      else angle = Math.sin(t * 1.5) * 0.08 + 0.05;
+      lShoulderRef.current.rotation.x = smoothStep(angle, lShoulderRef.current.rotation.x, 0.07);
+      lShoulderRef.current.rotation.z = smoothStep(isJumping ? 0.15 : 0.08, lShoulderRef.current.rotation.z, 0.05);
+    }
+    if (lElbowRef.current) {
+      let bend = crouch ? -0.5 : launch ? -0.3 : air ? -0.6 : land ? -0.8 : -0.15;
+      lElbowRef.current.rotation.x = smoothStep(bend, lElbowRef.current.rotation.x, 0.07);
+    }
+
+    // === RIGHT ARM ===
+    if (rShoulderRef.current) {
+      let angle;
+      if (crouch) angle = 0.5;
+      else if (launch) angle = -1.8;
+      else if (air) angle = -1.0 + Math.sin(t * 4 + 1) * 0.1;
+      else if (descend) angle = -0.3;
+      else if (land) angle = 0.8;
+      else angle = Math.sin(t * 1.5 + Math.PI) * 0.08 + 0.05;
+      rShoulderRef.current.rotation.x = smoothStep(angle, rShoulderRef.current.rotation.x, 0.07);
+      rShoulderRef.current.rotation.z = smoothStep(isJumping ? -0.15 : -0.08, rShoulderRef.current.rotation.z, 0.05);
+    }
+    if (rElbowRef.current) {
+      let bend = crouch ? -0.4 : launch ? -0.2 : air ? -0.5 : land ? -0.7 : -0.12;
+      rElbowRef.current.rotation.x = smoothStep(bend, rElbowRef.current.rotation.x, 0.07);
+    }
+
+    // === LEFT LEG ===
+    if (lHipRef.current) {
+      let angle;
+      if (crouch) angle = 0.7;
+      else if (launch) angle = -0.5;
+      else if (air) angle = 0.5 + Math.sin(t * 5) * 0.08;
+      else if (descend) angle = 0.15;
+      else if (land) angle = 0.8;
+      else angle = Math.sin(t * 1.2) * 0.03;
+      lHipRef.current.rotation.x = smoothStep(angle, lHipRef.current.rotation.x, 0.07);
+    }
+    if (lKneeRef.current) {
+      let bend = crouch ? 1.0 : launch ? 0.15 : air ? 0.5 : land ? 1.1 : 0.05;
+      lKneeRef.current.rotation.x = smoothStep(bend, lKneeRef.current.rotation.x, 0.07);
+    }
+
+    // === RIGHT LEG ===
+    if (rHipRef.current) {
+      let angle;
+      if (crouch) angle = 0.7;
+      else if (launch) angle = -0.4;
+      else if (air) angle = -0.3 + Math.sin(t * 5 + 2) * 0.08;
+      else if (descend) angle = 0.2;
+      else if (land) angle = 0.6;
+      else angle = Math.sin(t * 1.2 + Math.PI) * 0.03;
+      rHipRef.current.rotation.x = smoothStep(angle, rHipRef.current.rotation.x, 0.07);
+    }
+    if (rKneeRef.current) {
+      let bend = crouch ? 0.9 : launch ? 0.1 : air ? 0.7 : land ? 0.9 : 0.05;
+      rKneeRef.current.rotation.x = smoothStep(bend, rKneeRef.current.rotation.x, 0.07);
+    }
+
+    // === SASH (flowing behind) ===
+    if (sashRef.current) {
+      sashRef.current.rotation.x = -0.4 + Math.sin(t * 3) * 0.2 + (isJumping ? jumpSin * 0.5 : 0);
+      sashRef.current.rotation.z = Math.sin(t * 2.5) * 0.1;
+    }
+
+    // === HAIR (flowing) ===
+    if (hairRef.current) {
+      hairRef.current.rotation.x = -0.15 + Math.sin(t * 2.8) * 0.08 + (isJumping ? jumpSin * 0.3 : 0);
     }
   });
 
   return (
-    <group ref={groupRef} scale={1.3}>
-      {/* Head */}
-      <mesh position={[0, 0.72, 0]}>
-        <sphereGeometry args={[0.22, 16, 16]} />
-        <meshStandardMaterial color="#FFD4B2" roughness={0.8} />
-      </mesh>
+    <group scale={1.1}>
+      {/* ===== SPINE/TORSO GROUP ===== */}
+      <group ref={spineRef} position={[0, 0.72, 0]}>
 
-      {/* Eyes */}
-      <mesh position={[-0.08, 0.76, 0.19]}>
-        <sphereGeometry args={[0.035, 8, 8]} />
-        <meshStandardMaterial color="#1a1a2e" />
-      </mesh>
-      <mesh position={[0.08, 0.76, 0.19]}>
-        <sphereGeometry args={[0.035, 8, 8]} />
-        <meshStandardMaterial color="#1a1a2e" />
-      </mesh>
-
-      {/* Eye shine */}
-      <mesh position={[-0.065, 0.775, 0.215]}>
-        <sphereGeometry args={[0.012, 6, 6]} />
-        <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[0.095, 0.775, 0.215]}>
-        <sphereGeometry args={[0.012, 6, 6]} />
-        <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} />
-      </mesh>
-
-      {/* Smile */}
-      <mesh position={[0, 0.68, 0.2]} rotation={[0.2, 0, 0]}>
-        <torusGeometry args={[0.06, 0.012, 8, 12, Math.PI]} />
-        <meshStandardMaterial color="#c0392b" />
-      </mesh>
-
-      {/* Crown base */}
-      <mesh position={[0, 0.96, 0]}>
-        <cylinderGeometry args={[0.19, 0.22, 0.1, 8]} />
-        <meshStandardMaterial
-          color="#FFD700"
-          metalness={0.9}
-          roughness={0.1}
-          emissive="#FFD700"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
-      {/* Crown points */}
-      {[0, 1.2, 2.4, 3.6, 5.0].map((angle, i) => (
-        <mesh key={i} position={[Math.sin(angle) * 0.16, 1.08, Math.cos(angle) * 0.16]}>
-          <coneGeometry args={[0.04, 0.14, 4]} />
-          <meshStandardMaterial
-            color="#FFD700"
-            metalness={0.9}
-            roughness={0.1}
-            emissive="#FFD700"
-            emissiveIntensity={0.3}
-          />
+        {/* Upper torso / chest */}
+        <mesh position={[0, 0.26, 0]}>
+          <boxGeometry args={[0.36, 0.3, 0.2]} />
+          <meshStandardMaterial color={SKIN} roughness={0.85} />
         </mesh>
-      ))}
-      {/* Crown gem */}
-      <mesh position={[0, 1.06, 0.17]}>
-        <octahedronGeometry args={[0.035]} />
-        <meshStandardMaterial
-          color="#e74c3c"
-          emissive="#e74c3c"
-          emissiveIntensity={0.8}
-          metalness={0.5}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Body / Tunic */}
-      <mesh position={[0, 0.32, 0]}>
-        <boxGeometry args={[0.34, 0.45, 0.22]} />
-        <meshStandardMaterial color="#7B2FBE" roughness={0.6} />
-      </mesh>
-      {/* Belt */}
-      <mesh position={[0, 0.13, 0]}>
-        <boxGeometry args={[0.36, 0.06, 0.24]} />
-        <meshStandardMaterial color="#FFD700" metalness={0.7} roughness={0.2} />
-      </mesh>
-      {/* Belt buckle */}
-      <mesh position={[0, 0.13, 0.13]}>
-        <boxGeometry args={[0.06, 0.06, 0.02]} />
-        <meshStandardMaterial
-          color="#FFD700"
-          metalness={0.9}
-          roughness={0.1}
-          emissive="#FFD700"
-          emissiveIntensity={0.3}
-        />
-      </mesh>
-
-      {/* Cape */}
-      <mesh ref={capeRef} position={[0, 0.35, -0.12]} rotation={[-0.3, 0, 0]}>
-        <planeGeometry args={[0.4, 0.6, 4, 8]} />
-        <meshStandardMaterial
-          color="#C41E3A"
-          side={THREE.DoubleSide}
-          roughness={0.7}
-        />
-      </mesh>
-
-      {/* Left Arm */}
-      <group ref={leftArmRef} position={[-0.24, 0.38, 0]}>
-        <mesh position={[0, -0.12, 0]}>
-          <capsuleGeometry args={[0.05, 0.18, 4, 8]} />
-          <meshStandardMaterial color="#FFD4B2" roughness={0.8} />
+        {/* Vest - left panel */}
+        <mesh position={[-0.1, 0.28, 0.08]}>
+          <boxGeometry args={[0.15, 0.34, 0.08]} />
+          <meshStandardMaterial color={VEST} roughness={0.9} />
         </mesh>
+        {/* Vest - right panel */}
+        <mesh position={[0.1, 0.28, 0.08]}>
+          <boxGeometry args={[0.15, 0.34, 0.08]} />
+          <meshStandardMaterial color={VEST} roughness={0.9} />
+        </mesh>
+        {/* Vest back */}
+        <mesh position={[0, 0.26, -0.09]}>
+          <boxGeometry args={[0.34, 0.32, 0.05]} />
+          <meshStandardMaterial color={VEST} roughness={0.9} />
+        </mesh>
+
+        {/* Lower torso / abs */}
+        <mesh position={[0, 0.05, 0]}>
+          <boxGeometry args={[0.3, 0.2, 0.18]} />
+          <meshStandardMaterial color={SKIN} roughness={0.85} />
+        </mesh>
+        {/* Vest lower trim */}
+        <mesh position={[0, 0.05, 0.06]}>
+          <boxGeometry args={[0.28, 0.18, 0.06]} />
+          <meshStandardMaterial color={VEST_INNER} roughness={0.85} />
+        </mesh>
+
+        {/* Belt / sash wrap */}
+        <mesh position={[0, -0.07, 0]}>
+          <boxGeometry args={[0.34, 0.07, 0.22]} />
+          <meshStandardMaterial color={SASH} roughness={0.7} />
+        </mesh>
+        {/* Belt buckle */}
+        <mesh position={[0, -0.07, 0.12]}>
+          <boxGeometry args={[0.06, 0.06, 0.02]} />
+          <meshStandardMaterial color={METAL} metalness={0.8} roughness={0.2} />
+        </mesh>
+
+        {/* Sash tail (flowing behind) */}
+        <group ref={sashRef} position={[-0.08, -0.1, -0.1]}>
+          <mesh position={[0, -0.2, -0.05]} rotation={[0, 0, 0.05]}>
+            <boxGeometry args={[0.1, 0.4, 0.02]} />
+            <meshStandardMaterial color={SASH} roughness={0.7} side={THREE.DoubleSide} />
+          </mesh>
+        </group>
+
+        {/* ===== NECK + HEAD ===== */}
+        <group ref={headRef} position={[0, 0.48, 0]}>
+          {/* Neck */}
+          <mesh position={[0, -0.03, 0]}>
+            <cylinderGeometry args={[0.06, 0.07, 0.08, 8]} />
+            <meshStandardMaterial color={SKIN} roughness={0.85} />
+          </mesh>
+          {/* Head */}
+          <mesh position={[0, 0.1, 0]}>
+            <sphereGeometry args={[0.13, 16, 16]} />
+            <meshStandardMaterial color={SKIN} roughness={0.8} />
+          </mesh>
+          {/* Jaw / chin */}
+          <mesh position={[0, 0.03, 0.06]}>
+            <boxGeometry args={[0.12, 0.08, 0.08]} />
+            <meshStandardMaterial color={SKIN} roughness={0.8} />
+          </mesh>
+
+          {/* Eyes */}
+          <mesh position={[-0.045, 0.12, 0.11]}>
+            <sphereGeometry args={[0.022, 8, 8]} />
+            <meshStandardMaterial color="#f0f0f0" />
+          </mesh>
+          <mesh position={[0.045, 0.12, 0.11]}>
+            <sphereGeometry args={[0.022, 8, 8]} />
+            <meshStandardMaterial color="#f0f0f0" />
+          </mesh>
+          {/* Pupils */}
+          <mesh position={[-0.045, 0.12, 0.13]}>
+            <sphereGeometry args={[0.012, 6, 6]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+          <mesh position={[0.045, 0.12, 0.13]}>
+            <sphereGeometry args={[0.012, 6, 6]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+          {/* Eyebrows */}
+          <mesh position={[-0.045, 0.15, 0.12]} rotation={[0, 0, -0.15]}>
+            <boxGeometry args={[0.04, 0.008, 0.015]} />
+            <meshStandardMaterial color={HAIR} />
+          </mesh>
+          <mesh position={[0.045, 0.15, 0.12]} rotation={[0, 0, 0.15]}>
+            <boxGeometry args={[0.04, 0.008, 0.015]} />
+            <meshStandardMaterial color={HAIR} />
+          </mesh>
+
+          {/* Hair - top */}
+          <mesh position={[0, 0.17, -0.02]}>
+            <sphereGeometry args={[0.135, 12, 12]} />
+            <meshStandardMaterial color={HAIR} roughness={0.95} />
+          </mesh>
+          {/* Hair - flowing back */}
+          <group ref={hairRef} position={[0, 0.08, -0.1]}>
+            <mesh position={[0, -0.08, -0.04]}>
+              <boxGeometry args={[0.22, 0.2, 0.04]} />
+              <meshStandardMaterial color={HAIR} roughness={0.95} />
+            </mesh>
+            <mesh position={[0, -0.2, -0.06]}>
+              <boxGeometry args={[0.18, 0.12, 0.03]} />
+              <meshStandardMaterial color={HAIR} roughness={0.95} />
+            </mesh>
+          </group>
+          {/* Hair - sides */}
+          <mesh position={[-0.12, 0.08, 0.01]}>
+            <boxGeometry args={[0.04, 0.12, 0.08]} />
+            <meshStandardMaterial color={HAIR} roughness={0.95} />
+          </mesh>
+          <mesh position={[0.12, 0.08, 0.01]}>
+            <boxGeometry args={[0.04, 0.12, 0.08]} />
+            <meshStandardMaterial color={HAIR} roughness={0.95} />
+          </mesh>
+
+          {/* Headband */}
+          <mesh position={[0, 0.13, 0.03]}>
+            <cylinderGeometry args={[0.137, 0.137, 0.025, 16]} />
+            <meshStandardMaterial color={SASH} roughness={0.6} />
+          </mesh>
+        </group>
+
+        {/* ===== LEFT ARM ===== */}
+        <group ref={lShoulderRef} position={[-0.22, 0.36, 0]}>
+          {/* Shoulder cap */}
+          <mesh position={[-0.02, 0.02, 0]}>
+            <sphereGeometry args={[0.055, 8, 8]} />
+            <meshStandardMaterial color={VEST} roughness={0.8} />
+          </mesh>
+          {/* Upper arm */}
+          <mesh position={[0, -0.1, 0]}>
+            <capsuleGeometry args={[0.045, 0.16, 4, 8]} />
+            <meshStandardMaterial color={SKIN} roughness={0.85} />
+          </mesh>
+          {/* Elbow joint */}
+          <group ref={lElbowRef} position={[0, -0.22, 0]}>
+            {/* Forearm */}
+            <mesh position={[0, -0.1, 0]}>
+              <capsuleGeometry args={[0.04, 0.14, 4, 8]} />
+              <meshStandardMaterial color={SKIN} roughness={0.85} />
+            </mesh>
+            {/* Arm wrap */}
+            <mesh position={[0, -0.06, 0]}>
+              <cylinderGeometry args={[0.048, 0.048, 0.1, 8]} />
+              <meshStandardMaterial color={WRAPS} roughness={0.85} />
+            </mesh>
+            {/* Wrist guard */}
+            <mesh position={[0, -0.14, 0]}>
+              <cylinderGeometry args={[0.046, 0.05, 0.06, 8]} />
+              <meshStandardMaterial color={WRAPS} roughness={0.7} />
+            </mesh>
+            {/* Hand */}
+            <mesh position={[0, -0.2, 0.01]}>
+              <boxGeometry args={[0.05, 0.06, 0.03]} />
+              <meshStandardMaterial color={SKIN} roughness={0.85} />
+            </mesh>
+          </group>
+        </group>
+
+        {/* ===== RIGHT ARM ===== */}
+        <group ref={rShoulderRef} position={[0.22, 0.36, 0]}>
+          <mesh position={[0.02, 0.02, 0]}>
+            <sphereGeometry args={[0.055, 8, 8]} />
+            <meshStandardMaterial color={VEST} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, -0.1, 0]}>
+            <capsuleGeometry args={[0.045, 0.16, 4, 8]} />
+            <meshStandardMaterial color={SKIN} roughness={0.85} />
+          </mesh>
+          <group ref={rElbowRef} position={[0, -0.22, 0]}>
+            <mesh position={[0, -0.1, 0]}>
+              <capsuleGeometry args={[0.04, 0.14, 4, 8]} />
+              <meshStandardMaterial color={SKIN} roughness={0.85} />
+            </mesh>
+            <mesh position={[0, -0.06, 0]}>
+              <cylinderGeometry args={[0.048, 0.048, 0.1, 8]} />
+              <meshStandardMaterial color={WRAPS} roughness={0.85} />
+            </mesh>
+            <mesh position={[0, -0.14, 0]}>
+              <cylinderGeometry args={[0.046, 0.05, 0.06, 8]} />
+              <meshStandardMaterial color={WRAPS} roughness={0.7} />
+            </mesh>
+            <mesh position={[0, -0.2, 0.01]}>
+              <boxGeometry args={[0.05, 0.06, 0.03]} />
+              <meshStandardMaterial color={SKIN} roughness={0.85} />
+            </mesh>
+          </group>
+        </group>
+
+        {/* ===== DAGGER on back ===== */}
+        <group position={[0.06, 0.2, -0.14]} rotation={[0.1, 0, -0.2]}>
+          {/* Scabbard */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[0.025, 0.25, 0.018]} />
+            <meshStandardMaterial color="#1a0f08" roughness={0.9} />
+          </mesh>
+          {/* Handle */}
+          <mesh position={[0, 0.16, 0]}>
+            <cylinderGeometry args={[0.015, 0.012, 0.08, 6]} />
+            <meshStandardMaterial color={WRAPS} roughness={0.7} />
+          </mesh>
+          {/* Guard */}
+          <mesh position={[0, 0.12, 0]}>
+            <boxGeometry args={[0.06, 0.012, 0.025]} />
+            <meshStandardMaterial color={METAL} metalness={0.7} roughness={0.3} />
+          </mesh>
+          {/* Pommel */}
+          <mesh position={[0, 0.2, 0]}>
+            <sphereGeometry args={[0.015, 6, 6]} />
+            <meshStandardMaterial color={METAL} metalness={0.8} roughness={0.2} />
+          </mesh>
+        </group>
       </group>
-      {/* Right Arm */}
-      <group ref={rightArmRef} position={[0.24, 0.38, 0]}>
-        <mesh position={[0, -0.12, 0]}>
-          <capsuleGeometry args={[0.05, 0.18, 4, 8]} />
-          <meshStandardMaterial color="#FFD4B2" roughness={0.8} />
+
+      {/* ===== LEFT LEG ===== */}
+      <group ref={lHipRef} position={[-0.09, 0.65, 0]}>
+        {/* Upper leg */}
+        <mesh position={[0, -0.16, 0]}>
+          <capsuleGeometry args={[0.06, 0.2, 4, 8]} />
+          <meshStandardMaterial color={PANTS} roughness={0.8} />
         </mesh>
+        {/* Knee joint */}
+        <group ref={lKneeRef} position={[0, -0.32, 0]}>
+          {/* Lower leg */}
+          <mesh position={[0, -0.14, 0]}>
+            <capsuleGeometry args={[0.05, 0.18, 4, 8]} />
+            <meshStandardMaterial color={PANTS} roughness={0.8} />
+          </mesh>
+          {/* Knee wrap */}
+          <mesh position={[0, 0, 0.01]}>
+            <boxGeometry args={[0.08, 0.06, 0.06]} />
+            <meshStandardMaterial color={WRAPS} roughness={0.8} />
+          </mesh>
+          {/* Boot */}
+          <mesh position={[0, -0.27, 0]}>
+            <cylinderGeometry args={[0.05, 0.055, 0.1, 8]} />
+            <meshStandardMaterial color={BOOTS} roughness={0.9} />
+          </mesh>
+          {/* Boot sole */}
+          <mesh position={[0, -0.33, 0.02]}>
+            <boxGeometry args={[0.07, 0.04, 0.12]} />
+            <meshStandardMaterial color={BOOTS} roughness={0.95} />
+          </mesh>
+        </group>
       </group>
 
-      {/* Left Leg */}
-      <group ref={leftLegRef} position={[-0.1, 0.05, 0]}>
-        <mesh position={[0, -0.15, 0]}>
-          <capsuleGeometry args={[0.055, 0.16, 4, 8]} />
-          <meshStandardMaterial color="#2D1B69" roughness={0.8} />
+      {/* ===== RIGHT LEG ===== */}
+      <group ref={rHipRef} position={[0.09, 0.65, 0]}>
+        <mesh position={[0, -0.16, 0]}>
+          <capsuleGeometry args={[0.06, 0.2, 4, 8]} />
+          <meshStandardMaterial color={PANTS} roughness={0.8} />
         </mesh>
-        {/* Boot */}
-        <mesh position={[0, -0.28, 0.03]}>
-          <boxGeometry args={[0.1, 0.07, 0.15]} />
-          <meshStandardMaterial color="#4A2511" roughness={0.9} />
-        </mesh>
-      </group>
-      {/* Right Leg */}
-      <group ref={rightLegRef} position={[0.1, 0.05, 0]}>
-        <mesh position={[0, -0.15, 0]}>
-          <capsuleGeometry args={[0.055, 0.16, 4, 8]} />
-          <meshStandardMaterial color="#2D1B69" roughness={0.8} />
-        </mesh>
-        {/* Boot */}
-        <mesh position={[0, -0.28, 0.03]}>
-          <boxGeometry args={[0.1, 0.07, 0.15]} />
-          <meshStandardMaterial color="#4A2511" roughness={0.9} />
-        </mesh>
+        <group ref={rKneeRef} position={[0, -0.32, 0]}>
+          <mesh position={[0, -0.14, 0]}>
+            <capsuleGeometry args={[0.05, 0.18, 4, 8]} />
+            <meshStandardMaterial color={PANTS} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.01]}>
+            <boxGeometry args={[0.08, 0.06, 0.06]} />
+            <meshStandardMaterial color={WRAPS} roughness={0.8} />
+          </mesh>
+          <mesh position={[0, -0.27, 0]}>
+            <cylinderGeometry args={[0.05, 0.055, 0.1, 8]} />
+            <meshStandardMaterial color={BOOTS} roughness={0.9} />
+          </mesh>
+          <mesh position={[0, -0.33, 0.02]}>
+            <boxGeometry args={[0.07, 0.04, 0.12]} />
+            <meshStandardMaterial color={BOOTS} roughness={0.95} />
+          </mesh>
+        </group>
       </group>
     </group>
   );

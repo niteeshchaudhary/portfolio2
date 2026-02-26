@@ -10,8 +10,8 @@ function clamp(val, min, max) {
   return Math.max(min, Math.min(max, val));
 }
 
-function NavDots({ section, onNavigate, is3D }) {
-  if (!is3D) return null;
+function NavDots({ section, onNavigate, is3D, isContentOpen }) {
+  if (!is3D || isContentOpen) return null;
   const labels = ['Welcome', 'Skills', 'Experience', 'Projects', 'Contact'];
   return (
     <nav className="nav-dots">
@@ -43,16 +43,33 @@ export default function App() {
   const { skills, projects, experience, loading } = useFirebaseData();
   const [is3D, setIs3D] = useState(true);
   const [activeSection, setActiveSection] = useState(0);
+  const [isContentOpen, setIsContentOpen] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
   const scrollTarget = useRef(0);
   const touchStartY = useRef(0);
+  const openTimerRef = useRef(null);
 
   const navigateToSection = useCallback((index) => {
     scrollTarget.current = index / 4;
   }, []);
 
+  const handleCloseContent = useCallback(() => {
+    setIsContentOpen(false);
+  }, []);
+
+  // Auto-open content when prince lands on a new section
   useEffect(() => {
-    if (!is3D) return;
+    setIsContentOpen(false);
+    clearTimeout(openTimerRef.current);
+    openTimerRef.current = setTimeout(() => {
+      setIsContentOpen(true);
+    }, 900);
+    return () => clearTimeout(openTimerRef.current);
+  }, [activeSection]);
+
+  // Scroll / input handling — only active when content is CLOSED and in 3D mode
+  useEffect(() => {
+    if (!is3D || isContentOpen) return;
 
     const onWheel = (e) => {
       e.preventDefault();
@@ -91,7 +108,17 @@ export default function App() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [is3D]);
+  }, [is3D, isContentOpen]);
+
+  // Allow Escape key to close content
+  useEffect(() => {
+    if (!isContentOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setIsContentOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isContentOpen]);
 
   if (showLoading || loading) {
     return <LoadingScreen onFinished={() => setShowLoading(false)} />;
@@ -101,9 +128,15 @@ export default function App() {
     <div className="app">
       {is3D ? (
         <>
-          <Scene3D scrollTarget={scrollTarget} onSectionChange={setActiveSection} />
+          <Scene3D
+            scrollTarget={scrollTarget}
+            onSectionChange={setActiveSection}
+            isContentOpen={isContentOpen}
+          />
           <ContentOverlay
             section={activeSection}
+            isOpen={isContentOpen}
+            onClose={handleCloseContent}
             skills={skills}
             projects={projects}
             experience={experience}
@@ -113,7 +146,12 @@ export default function App() {
         <View2D skills={skills} projects={projects} experience={experience} />
       )}
 
-      <NavDots section={activeSection} onNavigate={navigateToSection} is3D={is3D} />
+      <NavDots
+        section={activeSection}
+        onNavigate={navigateToSection}
+        is3D={is3D}
+        isContentOpen={isContentOpen}
+      />
       <ViewToggle is3D={is3D} onToggle={() => setIs3D(prev => !prev)} />
 
       <header className="site-header">
