@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 
-function useInView(ref) {
+function useInView(ref, rootRef) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     if (!ref.current) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.15 }
+      { threshold: 0.1, root: rootRef?.current || null }
     );
     observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [ref]);
+  }, [ref, rootRef]);
   return inView;
 }
 
@@ -19,9 +19,9 @@ import CustomCursor from './CustomCursor';
 
 import ParallaxBackground from './ParallaxBackground';
 
-function AnimatedSection({ children, className = '', id }) {
+function AnimatedSection({ children, className = '', id, rootRef }) {
   const ref = useRef();
-  const inView = useInView(ref);
+  const inView = useInView(ref, rootRef);
   return (
     <section id={id} ref={ref} className={`v2d-section ${className} ${inView ? 'in-view' : ''}`}>
       {children}
@@ -142,7 +142,7 @@ export default function View2D({ skills, projects, experience }) {
       </section>
 
       {/* Skills */}
-      <AnimatedSection id="skills" className="v2d-skills">
+      <AnimatedSection id="skills" className="v2d-skills" rootRef={view2dRef}>
         <h2 className="v2d-section-title">⚡ Skills</h2>
         <div className="v2d-skills-grid">
           {skills?.map((skill, i) => (
@@ -160,7 +160,7 @@ export default function View2D({ skills, projects, experience }) {
       </AnimatedSection>
 
       {/* Experience */}
-      <AnimatedSection id="experience" className="v2d-experience">
+      <AnimatedSection id="experience" className="v2d-experience" rootRef={view2dRef}>
         <h2 className="v2d-section-title">💼 Experience</h2>
         <div className="v2d-timeline">
           {experience?.map((exp, i) => (
@@ -181,7 +181,7 @@ export default function View2D({ skills, projects, experience }) {
       </AnimatedSection>
 
       {/* Projects */}
-      <AnimatedSection id="projects" className="v2d-projects">
+      <AnimatedSection id="projects" className="v2d-projects" rootRef={view2dRef}>
         <h2 className="v2d-section-title">🚀 Projects</h2>
         <div className="v2d-projects-grid">
           {projects?.map((project, i) => (
@@ -208,7 +208,7 @@ export default function View2D({ skills, projects, experience }) {
       </AnimatedSection>
 
       {/* Contact */}
-      <AnimatedSection id="contact" className="v2d-contact">
+      <AnimatedSection id="contact" className="v2d-contact" rootRef={view2dRef}>
         <h2 className="v2d-section-title">✉ Contact</h2>
         <form ref={formRef} className="v2d-form" onSubmit={handleSubmit}>
           <div className="v2d-form-row">
