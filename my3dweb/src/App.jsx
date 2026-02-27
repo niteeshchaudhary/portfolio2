@@ -93,7 +93,7 @@ export default function App() {
   useEffect(() => {
     if (!is3D || isContentOpen) return;
 
-    const maxProgress = () => Math.min(unlockedRef.current / (TOTAL_SECTIONS - 1), 1);
+    const maxProgress = () => Math.min(unlockedRef.current / TOTAL_SECTIONS, 1);
 
     const onWheel = (e) => {
       e.preventDefault();

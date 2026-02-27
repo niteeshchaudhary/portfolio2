@@ -1,31 +1,49 @@
 import { useRef, useState, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Stars, Float, Text, Sparkles } from '@react-three/drei';
+import { Sparkles, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Blocks are laid out on a forward path (deeper into Z) for first-person traversal
-const BLOCK_POSITIONS = [
-  [0, 0, 0],
-  [2, 4, -12],
-  [-1.5, 9, -24],
-  [2.5, 14, -36],
-  [0, 19, -48],
-];
-
-const BLOCK_COLORS = ['#4a9eff', '#ff6b6b', '#ffd93d', '#6bcb77', '#a855f7'];
+const TOTAL_SECTIONS = 5;
 const SECTION_LABELS = ['Welcome', 'Skills', 'Experience', 'Projects', 'Contact'];
+const SCROLL_COLORS = ['#4a9eff', '#ff6b6b', '#ffd93d', '#6bcb77', '#a855f7'];
 
 const _vec3 = new THREE.Vector3();
 
-function jumpCurve(t) {
-  const peak = 0.42;
-  const normalized = t < peak ? t / peak : (1 - t) / (1 - peak);
-  return Math.pow(Math.sin(Math.min(normalized, 1) * Math.PI * 0.5), 0.9);
+// Closed-loop forest path — control points at ground level
+const PATH_POINTS = [
+  new THREE.Vector3(0, 0, 0),
+  new THREE.Vector3(18, 0, -12),
+  new THREE.Vector3(28, 0, -35),
+  new THREE.Vector3(12, 0, -55),
+  new THREE.Vector3(-10, 0, -58),
+  new THREE.Vector3(-28, 0, -40),
+  new THREE.Vector3(-22, 0, -15),
+  new THREE.Vector3(-8, 0, 5),
+];
+
+const PATH_CURVE = new THREE.CatmullRomCurve3(PATH_POINTS, true, 'catmullrom', 0.5);
+
+// Pre-compute scroll positions along the path (t = 0, 0.2, 0.4, 0.6, 0.8)
+const SCROLL_POSITIONS = Array.from({ length: TOTAL_SECTIONS }, (_, i) => {
+  const t = i / TOTAL_SECTIONS;
+  const p = PATH_CURVE.getPointAt(t);
+  return [p.x, p.y, p.z];
+});
+
+/* ============================================
+   Seeded random for stable procedural placement
+   ============================================ */
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
 }
 
-/* =============================================
-   3D SCROLL on each block
-   ============================================= */
+/* ============================================
+   SCROLL OBJECT (reused from previous version)
+   ============================================ */
 function ScrollObject({ color, isActive, isOpen }) {
   const groupRef = useRef();
   const sealRef = useRef();
@@ -35,7 +53,7 @@ function ScrollObject({ color, isActive, isOpen }) {
     const et = state.clock.elapsedTime;
     if (!groupRef.current) return;
 
-    const targetY = isOpen ? 1.6 : isActive ? 1.0 : 0.35;
+    const targetY = isOpen ? 1.8 : isActive ? 1.2 : 0.6;
     groupRef.current.position.y += (targetY - groupRef.current.position.y) * 0.05;
 
     if (!isOpen) {
@@ -59,27 +77,25 @@ function ScrollObject({ color, isActive, isOpen }) {
   });
 
   return (
-    <group ref={groupRef} position={[0, 0.35, 0]}>
+    <group ref={groupRef} position={[0, 0.6, 0]}>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.1, 0.1, 0.55, 14]} />
         <meshStandardMaterial color="#d4b896" roughness={0.65} />
       </mesh>
-      <mesh position={[0, 0, -0.32]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.03, 0.03, 0.14, 6]} />
-        <meshStandardMaterial color="#3d2b1f" roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0, -0.4]}>
-        <sphereGeometry args={[0.04, 8, 8]} />
-        <meshStandardMaterial color="#3d2b1f" roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 0, 0.32]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.03, 0.03, 0.14, 6]} />
-        <meshStandardMaterial color="#3d2b1f" roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0, 0.4]}>
-        <sphereGeometry args={[0.04, 8, 8]} />
-        <meshStandardMaterial color="#3d2b1f" roughness={0.7} />
-      </mesh>
+      {/* Wooden rods */}
+      {[-0.32, 0.32].map((zOff, i) => (
+        <group key={i}>
+          <mesh position={[0, 0, zOff]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.03, 0.03, 0.14, 6]} />
+            <meshStandardMaterial color="#3d2b1f" roughness={0.85} />
+          </mesh>
+          <mesh position={[0, 0, zOff + (i === 0 ? -0.08 : 0.08)]}>
+            <sphereGeometry args={[0.04, 8, 8]} />
+            <meshStandardMaterial color="#3d2b1f" roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
+      {/* Wax seal */}
       <mesh position={[0, 0.1, 0]}>
         <cylinderGeometry args={[0.055, 0.055, 0.02, 10]} />
         <meshStandardMaterial ref={sealRef} color="#8B1A1A" emissive="#ff3333" emissiveIntensity={0.3} roughness={0.4} />
@@ -88,7 +104,7 @@ function ScrollObject({ color, isActive, isOpen }) {
         <torusGeometry args={[0.12, 0.01, 4, 20]} />
         <meshStandardMaterial color="#8B1A1A" roughness={0.6} />
       </mesh>
-
+      {/* Unfurled paper */}
       <group ref={paperRef} position={[0, 0.3, 0]} scale={[0, 0, 1]}>
         <mesh>
           <planeGeometry args={[0.6, 0.5]} />
@@ -102,7 +118,7 @@ function ScrollObject({ color, isActive, isOpen }) {
         ))}
       </group>
 
-      <pointLight color={isOpen ? '#ffd700' : color} intensity={isOpen ? 6 : isActive ? 3 : 0.5} distance={isOpen ? 10 : 5} />
+      <pointLight color={isOpen ? '#ffd700' : color} intensity={isOpen ? 6 : isActive ? 3 : 0.5} distance={isOpen ? 12 : 6} />
       {isActive && (
         <Sparkles count={isOpen ? 50 : 25} scale={isOpen ? 3 : 2} size={isOpen ? 5 : 3} speed={isOpen ? 2 : 0.8} color="#ffd700" opacity={0.9} />
       )}
@@ -110,267 +126,413 @@ function ScrollObject({ color, isActive, isOpen }) {
   );
 }
 
-/* =============================================
-   FLOATING BLOCK (platform)
-   ============================================= */
-function FloatingBlock({ position, color, label, isActive, isContentOpen }) {
-  const glowRef = useRef();
+/* ============================================
+   SCROLL CLEARING — pedestal + lanterns + scroll
+   ============================================ */
+function ScrollClearing({ position, color, label, isActive, isContentOpen }) {
   const lightRef = useRef();
 
   useFrame(() => {
-    if (glowRef.current) {
-      const tgt = isActive ? 0.7 : 0.12;
-      glowRef.current.emissiveIntensity += (tgt - glowRef.current.emissiveIntensity) * 0.05;
-    }
     if (lightRef.current) {
-      lightRef.current.intensity += ((isActive ? 6 : 1) - lightRef.current.intensity) * 0.06;
+      lightRef.current.intensity += ((isActive ? 8 : 1.5) - lightRef.current.intensity) * 0.05;
     }
   });
 
   return (
-    <Float speed={1.2} rotationIntensity={0} floatIntensity={0.2}>
-      <group position={position}>
-        <mesh position={[0, -0.2, 0]}>
-          <boxGeometry args={[3.2, 0.4, 3.2]} />
-          <meshStandardMaterial
-            ref={glowRef}
-            color={new THREE.Color(color).multiplyScalar(0.5)}
-            emissive={color}
-            emissiveIntensity={0.12}
-            metalness={0.3}
-            roughness={0.8}
-          />
-        </mesh>
-        <mesh position={[0, 0.02, 0]}>
-          <boxGeometry args={[2.9, 0.06, 2.9]} />
-          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={isActive ? 0.5 : 0.1} metalness={0.5} roughness={0.4} transparent opacity={0.5} />
-        </mesh>
+    <group position={position}>
+      {/* Stone pedestal */}
+      <mesh position={[0, 0.15, 0]}>
+        <cylinderGeometry args={[0.8, 1.0, 0.3, 8]} />
+        <meshStandardMaterial color="#555a55" roughness={0.9} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 0.02, 0]}>
+        <cylinderGeometry args={[1.2, 1.3, 0.05, 8]} />
+        <meshStandardMaterial color="#444844" roughness={0.95} />
+      </mesh>
 
-        {/* Edge runes */}
-        {[[0, 1.5, 0], [0, -1.5, 0], [1.5, 0, Math.PI / 2], [-1.5, 0, Math.PI / 2]].map(([ex, ez, ry], i) => (
-          <mesh key={i} position={[ex, -0.05, ez]} rotation={[0, ry || 0, 0]}>
-            <boxGeometry args={[2.6, 0.08, 0.06]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={isActive ? 1.2 : 0.15} transparent opacity={0.7} />
-          </mesh>
-        ))}
-
-        {/* Corner pillars */}
-        {[[-1.4, -1.4], [1.4, -1.4], [-1.4, 1.4], [1.4, 1.4]].map(([px, pz], i) => (
-          <group key={i} position={[px, 0.1, pz]}>
-            <mesh>
-              <cylinderGeometry args={[0.07, 0.1, 0.6, 6]} />
-              <meshStandardMaterial color={color} emissive={color} emissiveIntensity={isActive ? 0.9 : 0.15} metalness={0.5} roughness={0.5} />
+      {/* Lanterns in a ring around the clearing */}
+      {[0, 1, 2, 3, 4, 5].map((i) => {
+        const angle = (i / 6) * Math.PI * 2;
+        const lx = Math.cos(angle) * 3;
+        const lz = Math.sin(angle) * 3;
+        return (
+          <group key={i} position={[lx, 0, lz]}>
+            {/* Post */}
+            <mesh position={[0, 0.5, 0]}>
+              <cylinderGeometry args={[0.04, 0.05, 1, 6]} />
+              <meshStandardMaterial color="#3d2b1f" roughness={0.8} />
             </mesh>
-            <mesh position={[0, 0.35, 0]}>
-              <sphereGeometry args={[0.06, 8, 8]} />
-              <meshStandardMaterial color="white" emissive={color} emissiveIntensity={isActive ? 2 : 0.3} />
+            {/* Lantern glow */}
+            <mesh position={[0, 1.05, 0]}>
+              <sphereGeometry args={[0.1, 8, 8]} />
+              <meshStandardMaterial
+                color={color}
+                emissive={color}
+                emissiveIntensity={isActive ? 3 : 0.6}
+                transparent
+                opacity={0.8}
+              />
             </mesh>
+            <pointLight position={[0, 1.1, 0]} color={color} intensity={isActive ? 1.5 : 0.2} distance={6} />
           </group>
-        ))}
+        );
+      })}
 
+      {/* Scroll object on the pedestal */}
+      <group position={[0, 0.3, 0]}>
         <ScrollObject color={color} isActive={isActive} isOpen={isActive && isContentOpen} />
-
-        <Text position={[0, -0.6, 1.8]} fontSize={0.26} color="white" anchorX="center" anchorY="middle" outlineWidth={0.025} outlineColor="#000000">
-          {label}
-        </Text>
-
-        {isActive && !isContentOpen && (
-          <Sparkles count={40} scale={5} size={3} speed={0.8} color={color} opacity={0.7} />
-        )}
-
-        <pointLight ref={lightRef} color={color} intensity={1} distance={12} />
       </group>
-    </Float>
+
+      {/* Label */}
+      <Text
+        position={[0, -0.3, 2.2]}
+        fontSize={0.35}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.03}
+        outlineColor="#000000"
+      >
+        {label}
+      </Text>
+
+      {/* Clearing glow */}
+      <pointLight ref={lightRef} position={[0, 2.5, 0]} color={color} intensity={1.5} distance={15} />
+
+      {isActive && !isContentOpen && (
+        <Sparkles count={60} scale={6} size={3} speed={0.6} color={color} opacity={0.6} />
+      )}
+    </group>
   );
 }
 
-/* =============================================
-   LANDING IMPACT RING
-   ============================================= */
-function LandingImpact({ pos, intensity }) {
-  const ref = useRef();
-  const matRef = useRef();
-  const scaleRef = useRef(0);
-
-  useFrame(() => {
-    scaleRef.current += ((intensity > 0.02 ? 5 : 0) - scaleRef.current) * (intensity > 0.02 ? 0.12 : 0.15);
-    if (ref.current) {
-      ref.current.scale.set(scaleRef.current, scaleRef.current, scaleRef.current);
-      ref.current.position.set(pos[0], pos[1] - 1.5, pos[2]);
-    }
-    if (matRef.current) matRef.current.opacity = intensity * 0.5;
-  });
-
+/* ============================================
+   PINE TREE
+   ============================================ */
+function PineTree({ position, scale = 1 }) {
   return (
-    <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[0.6, 1.2, 32]} />
-      <meshBasicMaterial ref={matRef} color="#ffd700" transparent opacity={0} side={THREE.DoubleSide} />
+    <group position={position} scale={scale}>
+      {/* Trunk */}
+      <mesh position={[0, 1.2, 0]}>
+        <cylinderGeometry args={[0.12, 0.18, 2.4, 6]} />
+        <meshStandardMaterial color="#3d2515" roughness={0.9} />
+      </mesh>
+      {/* Foliage tiers */}
+      <mesh position={[0, 2.8, 0]}>
+        <coneGeometry args={[1.2, 2.2, 7]} />
+        <meshStandardMaterial color="#1a3a1a" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 3.8, 0]}>
+        <coneGeometry args={[0.9, 1.8, 7]} />
+        <meshStandardMaterial color="#1e4220" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 4.6, 0]}>
+        <coneGeometry args={[0.55, 1.3, 7]} />
+        <meshStandardMaterial color="#224a26" roughness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ============================================
+   DECIDUOUS TREE
+   ============================================ */
+function BroadTree({ position, scale = 1 }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 1.5, 0]}>
+        <cylinderGeometry args={[0.15, 0.22, 3, 6]} />
+        <meshStandardMaterial color="#4a3520" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 3.5, 0]}>
+        <sphereGeometry args={[1.4, 8, 8]} />
+        <meshStandardMaterial color="#1e3a18" roughness={0.9} />
+      </mesh>
+      <mesh position={[0.6, 3.0, 0.4]}>
+        <sphereGeometry args={[0.9, 7, 7]} />
+        <meshStandardMaterial color="#1a3515" roughness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ============================================
+   ROCK
+   ============================================ */
+function Rock({ position, scale = 1, rotation = 0 }) {
+  return (
+    <mesh position={position} scale={scale} rotation={[0, rotation, Math.random() * 0.3]}>
+      <dodecahedronGeometry args={[0.5, 0]} />
+      <meshStandardMaterial color="#4a4f4a" roughness={0.95} metalness={0.05} />
     </mesh>
   );
 }
 
-/* =============================================
-   AMBIENT PARTICLES
-   ============================================= */
-function AmbientParticles() {
-  const ref = useRef();
-  const count = 250;
-  const positions = useMemo(() => {
-    const p = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      p[i * 3] = (Math.random() - 0.5) * 60;
-      p[i * 3 + 1] = Math.random() * 35 - 5;
-      p[i * 3 + 2] = (Math.random() - 0.5) * 80;
+/* ============================================
+   BUSH
+   ============================================ */
+function Bush({ position, scale = 1 }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0.25, 0]}>
+        <sphereGeometry args={[0.4, 7, 6]} />
+        <meshStandardMaterial color="#1a3018" roughness={0.92} />
+      </mesh>
+      <mesh position={[0.25, 0.2, 0.15]}>
+        <sphereGeometry args={[0.3, 6, 5]} />
+        <meshStandardMaterial color="#162b14" roughness={0.92} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ============================================
+   FOREST — all procedural scenery
+   ============================================ */
+function Forest() {
+  const { trees, rocks, bushes } = useMemo(() => {
+    const rng = seededRandom(42);
+    const treeList = [];
+    const rockList = [];
+    const bushList = [];
+
+    // Sample points along the path for proximity checks
+    const pathSamples = [];
+    for (let i = 0; i < 200; i++) {
+      const p = PATH_CURVE.getPointAt(i / 200);
+      pathSamples.push(p);
     }
-    return p;
+
+    function distToPath(x, z) {
+      let min = Infinity;
+      for (const p of pathSamples) {
+        const dx = p.x - x;
+        const dz = p.z - z;
+        const d = dx * dx + dz * dz;
+        if (d < min) min = d;
+      }
+      return Math.sqrt(min);
+    }
+
+    // Generate trees — avoid the path (min 3.5 units away)
+    for (let i = 0; i < 80; i++) {
+      const x = (rng() - 0.5) * 80;
+      const z = (rng() - 0.5) * 80;
+      const dist = distToPath(x, z);
+      if (dist < 3.5) continue;
+      const s = 0.7 + rng() * 0.8;
+      const isPine = rng() > 0.35;
+      treeList.push({ x, z, scale: s, isPine, key: `tree-${i}` });
+    }
+
+    // Generate rocks
+    for (let i = 0; i < 25; i++) {
+      const x = (rng() - 0.5) * 70;
+      const z = (rng() - 0.5) * 70;
+      const dist = distToPath(x, z);
+      if (dist < 2) continue;
+      rockList.push({ x, z, scale: 0.4 + rng() * 0.8, rotation: rng() * Math.PI * 2, key: `rock-${i}` });
+    }
+
+    // Generate bushes — closer to path (1.5-5 units)
+    for (let i = 0; i < 35; i++) {
+      const x = (rng() - 0.5) * 70;
+      const z = (rng() - 0.5) * 70;
+      const dist = distToPath(x, z);
+      if (dist < 1.5 || dist > 8) continue;
+      bushList.push({ x, z, scale: 0.6 + rng() * 0.7, key: `bush-${i}` });
+    }
+
+    return { trees: treeList, rocks: rockList, bushes: bushList };
   }, []);
-  useFrame((s) => { if (ref.current) ref.current.rotation.y = s.clock.elapsedTime * 0.008; });
+
+  return (
+    <group>
+      {trees.map((t) =>
+        t.isPine
+          ? <PineTree key={t.key} position={[t.x, 0, t.z]} scale={t.scale} />
+          : <BroadTree key={t.key} position={[t.x, 0, t.z]} scale={t.scale} />
+      )}
+      {rocks.map((r) => (
+        <Rock key={r.key} position={[r.x, 0.15, r.z]} scale={r.scale} rotation={r.rotation} />
+      ))}
+      {bushes.map((b) => (
+        <Bush key={b.key} position={[b.x, 0, b.z]} scale={b.scale} />
+      ))}
+    </group>
+  );
+}
+
+/* ============================================
+   DIRT PATH — flat tube along the spline
+   ============================================ */
+function DirtPath() {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-1.2, -0.02);
+    shape.lineTo(1.2, -0.02);
+    shape.lineTo(1.2, 0.02);
+    shape.lineTo(-1.2, 0.02);
+    shape.closePath();
+
+    const pts = PATH_CURVE.getPoints(300);
+    const curve2 = new THREE.CatmullRomCurve3(pts, true);
+    const extrudeSettings = {
+      steps: 300,
+      bevelEnabled: false,
+      extrudePath: curve2,
+    };
+    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+  }, []);
+
+  return (
+    <mesh geometry={geometry} position={[0, 0.01, 0]}>
+      <meshStandardMaterial color="#5c4a32" roughness={0.95} />
+    </mesh>
+  );
+}
+
+/* ============================================
+   GROUND PLANE
+   ============================================ */
+function Ground() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+      <planeGeometry args={[200, 200]} />
+      <meshStandardMaterial color="#1a2e1a" roughness={1} />
+    </mesh>
+  );
+}
+
+/* ============================================
+   FIREFLIES (ambient particles)
+   ============================================ */
+function Fireflies() {
+  const count = 200;
+  const positions = useMemo(() => {
+    const rng = seededRandom(99);
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (rng() - 0.5) * 80;
+      arr[i * 3 + 1] = 0.5 + rng() * 4;
+      arr[i * 3 + 2] = (rng() - 0.5) * 80;
+    }
+    return arr;
+  }, []);
+
+  const ref = useRef();
+  useFrame((s) => {
+    if (ref.current) {
+      ref.current.rotation.y = Math.sin(s.clock.elapsedTime * 0.05) * 0.3;
+    }
+  });
+
   return (
     <points ref={ref}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial size={0.07} color="#a78bfa" transparent opacity={0.4} sizeAttenuation />
+      <pointsMaterial size={0.12} color="#c8e550" transparent opacity={0.6} sizeAttenuation />
     </points>
   );
 }
 
-/* =============================================
-   FIRST-PERSON SCENE
-   ============================================= */
-function SceneInner({ scrollTarget, onSectionChange, isContentOpen }) {
+/* ============================================
+   FIRST-PERSON CAMERA ON SPLINE
+   ============================================ */
+function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
   const { camera } = useThree();
   const smoothProgress = useRef(0);
   const prevSection = useRef(-1);
   const [activeSection, setActiveSection] = useState(0);
-  const playerPos = useRef([0, 1.7, 0]);
 
-  // Smooth look target for first-person
-  const lookTarget = useRef(new THREE.Vector3(0, 2, -12));
-
-  // Landing effects
-  const prevJumpH = useRef(0);
+  const lookDir = useRef(new THREE.Vector3(0, 0, -1));
   const shakeAmount = useRef(0);
-  const landingIntensity = useRef(0);
 
   useFrame((state) => {
     if (!isContentOpen) {
-      smoothProgress.current += (scrollTarget.current - smoothProgress.current) * 0.035;
+      smoothProgress.current += (scrollTarget.current - smoothProgress.current) * 0.03;
     }
-    const progress = smoothProgress.current;
+
+    const progress = smoothProgress.current % 1;
     const et = state.clock.elapsedTime;
 
-    const total = BLOCK_POSITIONS.length;
-    const sp = progress * (total - 1);
-    const cur = Math.min(Math.floor(sp), total - 2);
-    const nxt = Math.min(cur + 1, total - 1);
-    const t = Math.max(0, Math.min(sp - cur, 1));
+    // Position on path
+    const pos = PATH_CURVE.getPointAt(progress);
+    const eyeHeight = 1.6;
 
-    const from = BLOCK_POSITIONS[cur];
-    const to = BLOCK_POSITIONS[nxt];
+    // Head bob while walking
+    const speed = Math.abs(scrollTarget.current - smoothProgress.current);
+    const bobIntensity = Math.min(speed * 15, 1);
+    const bobY = Math.sin(et * 5) * 0.04 * bobIntensity;
+    const bobX = Math.sin(et * 2.5) * 0.02 * bobIntensity;
 
-    const x = THREE.MathUtils.lerp(from[0], to[0], t);
-    const baseY = THREE.MathUtils.lerp(from[1], to[1], t);
-    const jumpH = jumpCurve(t) * 5;
-    const z = THREE.MathUtils.lerp(from[2], to[2], t);
-    const eyeY = baseY + jumpH + 1.7;
+    camera.position.set(pos.x + bobX, pos.y + eyeHeight + bobY, pos.z);
 
-    playerPos.current = [x, eyeY, z];
-
-    // Landing detection
-    if (prevJumpH.current > 2 && jumpH < 1) {
-      shakeAmount.current = 0.18;
-      landingIntensity.current = 1;
-    }
-    prevJumpH.current = jumpH;
-    shakeAmount.current *= 0.85;
-    landingIntensity.current *= 0.9;
-
-    // === FIRST-PERSON CAMERA POSITION ===
-    camera.position.set(x, eyeY, z);
-
-    // Head bob: subtle during idle, pronounced during jump
-    const ji = jumpCurve(t);
-    if (ji > 0.05) {
-      camera.position.x += Math.sin(et * 14) * 0.04 * ji;
-      camera.position.y += Math.abs(Math.sin(et * 10)) * 0.03 * ji;
-    } else {
-      camera.position.y += Math.sin(et * 1.5) * 0.015;
-      camera.position.x += Math.sin(et * 0.6) * 0.008;
-    }
-
-    // Camera shake on landing
-    if (shakeAmount.current > 0.01) {
+    // Landing shake
+    shakeAmount.current *= 0.9;
+    if (shakeAmount.current > 0.005) {
       camera.position.x += (Math.random() - 0.5) * shakeAmount.current;
-      camera.position.y += (Math.random() - 0.5) * shakeAmount.current * 0.7;
+      camera.position.y += (Math.random() - 0.5) * shakeAmount.current * 0.5;
     }
 
-    // === FIRST-PERSON LOOK DIRECTION ===
-    // During jump: look toward landing zone, tilt based on ascent/descent
-    // Idle on block: look toward the next block
-    const isLastBlock = cur >= total - 2 && t > 0.9;
-    let targetX, targetY, targetZ;
-
-    if (isLastBlock) {
-      const last = BLOCK_POSITIONS[total - 1];
-      targetX = last[0];
-      targetY = last[1] + 3;
-      targetZ = last[2] - 15;
-    } else {
-      targetX = to[0];
-      targetZ = to[2];
-      // Vertical look offset: look up during launch, down during descent
-      const verticalPhase = (0.5 - t) * 4;
-      targetY = to[1] + 2 + verticalPhase;
+    // Idle breathing when still
+    if (bobIntensity < 0.1) {
+      camera.position.y += Math.sin(et * 1.2) * 0.012;
     }
 
-    lookTarget.current.x += (targetX - lookTarget.current.x) * 0.025;
-    lookTarget.current.y += (targetY - lookTarget.current.y) * 0.025;
-    lookTarget.current.z += (targetZ - lookTarget.current.z) * 0.025;
+    // Look direction — tangent of the path
+    const tangent = PATH_CURVE.getTangentAt(progress);
+    const targetLook = new THREE.Vector3(
+      pos.x + tangent.x * 8,
+      pos.y + eyeHeight + tangent.y * 8,
+      pos.z + tangent.z * 8,
+    );
 
-    camera.lookAt(lookTarget.current);
+    lookDir.current.lerp(targetLook, 0.04);
+    camera.lookAt(lookDir.current);
 
-    // Dynamic FOV: wider base for FPS, even wider during jumps
-    const targetFov = 78 + ji * 15;
+    // FOV
+    const targetFov = 72 + bobIntensity * 8;
     camera.fov += (targetFov - camera.fov) * 0.04;
     camera.updateProjectionMatrix();
 
-    // Section change
-    const section = t < 0.5 ? cur : nxt;
+    // Section detection
+    const sp = progress * TOTAL_SECTIONS;
+    const section = Math.floor(sp) % TOTAL_SECTIONS;
     if (section !== prevSection.current) {
       prevSection.current = section;
       setActiveSection(section);
       onSectionChange(section);
+      shakeAmount.current = 0.08;
     }
   });
 
   return (
     <>
       {/* === LIGHTING === */}
-      <ambientLight intensity={0.15} color="#7080b0" />
-      <directionalLight position={[8, 30, 5]} intensity={0.6} color="#ffe8d0" />
-      <directionalLight position={[-10, 20, -15]} intensity={0.25} color="#7c3aed" />
-      <hemisphereLight args={['#1a1040', '#050510', 0.25]} />
+      <ambientLight intensity={0.08} color="#8090b0" />
+      <directionalLight position={[10, 40, 5]} intensity={0.35} color="#b0c0e0" />
+      <hemisphereLight args={['#1a2040', '#0a150a', 0.2]} />
+
+      {/* Moonlight backlight */}
+      <directionalLight position={[-20, 30, -20]} intensity={0.15} color="#6070a0" />
 
       {/* === ENVIRONMENT === */}
-      <Stars radius={180} depth={120} count={7000} factor={7} saturation={0.15} fade speed={0.3} />
-      <AmbientParticles />
+      <Ground />
+      <DirtPath />
+      <Forest />
+      <Fireflies />
 
-      {/* Nebula accent lights */}
-      <pointLight position={[-30, 10, -30]} color="#7c3aed" intensity={3} distance={70} />
-      <pointLight position={[30, 20, -20]} color="#1d4ed8" intensity={2.5} distance={65} />
-      <pointLight position={[5, 30, -50]} color="#db2777" intensity={2} distance={60} />
-      <pointLight position={[-15, -5, 10]} color="#0ea5e9" intensity={1.2} distance={45} />
+      {/* Global sparkles for depth */}
+      <Sparkles count={100} scale={50} size={2} speed={0.3} color="#88aa44" opacity={0.3} />
 
-      {/* === LANDING IMPACT === */}
-      <LandingImpact pos={playerPos.current} intensity={landingIntensity.current} />
-
-      {/* === BLOCKS with SCROLLS === */}
-      {BLOCK_POSITIONS.map((pos, i) => (
-        <FloatingBlock
+      {/* === SCROLL CLEARINGS === */}
+      {SCROLL_POSITIONS.map((pos, i) => (
+        <ScrollClearing
           key={i}
           position={pos}
-          color={BLOCK_COLORS[i]}
+          color={SCROLL_COLORS[i]}
           label={SECTION_LABELS[i]}
           isActive={activeSection === i}
           isContentOpen={activeSection === i && isContentOpen}
@@ -380,20 +542,20 @@ function SceneInner({ scrollTarget, onSectionChange, isContentOpen }) {
   );
 }
 
-/* =============================================
+/* ============================================
    EXPORTED SCENE3D
-   ============================================= */
+   ============================================ */
 export default function Scene3D({ scrollTarget, onSectionChange, isContentOpen }) {
   return (
     <Canvas
-      camera={{ position: [0, 1.7, 0], fov: 78, near: 0.1, far: 200 }}
+      camera={{ position: [0, 1.6, 0], fov: 72, near: 0.1, far: 120 }}
       style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       dpr={[1, 1.5]}
     >
-      <fog attach="fog" args={['#050510', 15, 80]} />
-      <color attach="background" args={['#050510']} />
-      <SceneInner scrollTarget={scrollTarget} onSectionChange={onSectionChange} isContentOpen={isContentOpen} />
+      <fog attach="fog" args={['#0a150a', 8, 45]} />
+      <color attach="background" args={['#0a150a']} />
+      <ForestScene scrollTarget={scrollTarget} onSectionChange={onSectionChange} isContentOpen={isContentOpen} />
     </Canvas>
   );
 }
