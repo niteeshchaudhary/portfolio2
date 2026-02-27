@@ -950,11 +950,21 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 /* ============================================
    EXPORTED SCENE3D
    ============================================ */
-export default function Scene3D({ scrollTarget, onSectionChange, isContentOpen }) {
+export default function Scene3D({ scrollTarget, onSectionChange, isContentOpen, isVisible = true }) {
   return (
     <Canvas
       camera={{ position: [0, 1.6, 0], fov: 72, near: 0.1, far: 120 }}
-      style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        zIndex: 0,
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? 'auto' : 'none',
+        transition: 'opacity 0.6s ease'
+      }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       dpr={[1, 1.5]}
     >

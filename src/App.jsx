@@ -145,19 +145,22 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [isContentOpen]);
 
-  if (showLoading || loading) {
-    return <LoadingScreen onFinished={() => setShowLoading(false)} />;
-  }
+  const isLoading = showLoading || loading;
 
   return (
     <div className="app">
-      {is3D ? (
+      {isLoading && <LoadingScreen onFinished={() => setShowLoading(false)} />}
+
+      {/* 3D Scene is ALWAYS mounted so it preloads and doesn't get destroyed when toggling to 2D */}
+      <Scene3D
+        scrollTarget={scrollTarget}
+        onSectionChange={setActiveSection}
+        isContentOpen={isContentOpen}
+        isVisible={is3D && !isLoading}
+      />
+
+      {is3D && !isLoading && (
         <>
-          <Scene3D
-            scrollTarget={scrollTarget}
-            onSectionChange={setActiveSection}
-            isContentOpen={isContentOpen}
-          />
           <ContentOverlay
             section={activeSection}
             isOpen={isContentOpen}
@@ -168,11 +171,15 @@ export default function App() {
           />
           <GameHUD section={activeSection} isContentOpen={isContentOpen} is3D={is3D} />
         </>
-      ) : (
+      )}
+
+      {!is3D && !isLoading && (
         <View2D skills={skills} projects={projects} experience={experience} />
       )}
 
-      <ViewToggle is3D={is3D} onToggle={() => setIs3D(prev => !prev)} />
+      {!isLoading && (
+        <ViewToggle is3D={is3D} onToggle={() => setIs3D(prev => !prev)} />
+      )}
 
       <header className="site-header">
         <span className="site-logo">NKC</span>
