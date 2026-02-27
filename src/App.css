@@ -833,8 +833,8 @@
   width: 14vh;
   height: 14vh;
   border-radius: 50%;
-  background: #fff3d8;
-  box-shadow: 0 0 50px rgba(255, 243, 216, 0.6), inset -10px -10px 20px rgba(0, 0, 0, 0.1);
+  background: #6b7280;
+  box-shadow: 0 0 50px rgba(107, 114, 128, 0.6), inset -10px -10px 20px rgba(0, 0, 0, 0.3);
   position: absolute;
   top: 15vh;
   right: 20vw;
