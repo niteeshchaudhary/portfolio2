@@ -104,7 +104,13 @@ function ProjectsSection({ projects }) {
             className="project-card"
             style={{ animationDelay: `${i * 0.08}s` }}
           >
-            <div className="project-icon">{project.name.charAt(0)}</div>
+            {project.thumb ? (
+              <div className="project-thumb-container">
+                <img src={project.thumb} alt={project.name} className="project-thumb" />
+              </div>
+            ) : (
+              <div className="project-icon">{project.name.charAt(0)}</div>
+            )}
             <div className="project-info">
               <h3 className="project-name">{project.name}</h3>
               <span className="project-link-text">View on GitHub →</span>
