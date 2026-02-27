@@ -343,6 +343,16 @@
   text-align: center;
 }
 
+.hero-profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 3px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
 .hero-greeting {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.5);
@@ -382,6 +392,19 @@
   color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
   margin-bottom: 28px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-email-link {
+  color: #a855f7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.hero-email-link:hover {
+  text-decoration: underline;
 }
 
 .scroll-hint {
@@ -1135,12 +1158,13 @@
 /* --- OBJECTIVE (top-left) --- */
 .hud-objective {
   position: fixed;
-  top: 20px;
-  left: 24px;
+  bottom: 95px;
+  right: 24px;
   z-index: 70;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  align-items: flex-end;
 }
 
 .hud-label {
@@ -1254,8 +1278,8 @@
   }
 
   .hud-objective {
-    left: 16px;
-    top: 16px;
+    right: 16px;
+    bottom: 85px;
   }
 
   .hud-progress {

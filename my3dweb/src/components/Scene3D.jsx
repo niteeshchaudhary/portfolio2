@@ -30,6 +30,23 @@ const SCROLL_POSITIONS = Array.from({ length: TOTAL_SECTIONS }, (_, i) => {
   return [p.x, p.y, p.z];
 });
 
+// Pre-compute landmark positions at midpoints between sections, offset to the side
+function getLandmarkPos(tMid, sideOffset) {
+  const p = PATH_CURVE.getPointAt(tMid);
+  const tangent = PATH_CURVE.getTangentAt(tMid);
+  const up = new THREE.Vector3(0, 1, 0);
+  const perp = new THREE.Vector3().crossVectors(tangent, up).normalize();
+  return [p.x + perp.x * sideOffset, 0, p.z + perp.z * sideOffset];
+}
+
+const LANDMARK_POSITIONS = {
+  mountains:  getLandmarkPos(0.1, -18),
+  waterfall:  getLandmarkPos(0.3, 14),
+  bridge:     getLandmarkPos(0.5, -12),
+  mushrooms:  getLandmarkPos(0.7, 10),
+  ruins:      getLandmarkPos(0.9, -14),
+};
+
 /* ============================================
    Seeded random for stable procedural placement
    ============================================ */
@@ -261,7 +278,7 @@ function BroadTree({ position, scale = 1 }) {
    ============================================ */
 function Rock({ position, scale = 1, rotation = 0 }) {
   return (
-    <mesh position={position} scale={scale} rotation={[0, rotation, Math.random() * 0.3]}>
+    <mesh position={position} scale={scale} rotation={[0, rotation, 0.15]}>
       <dodecahedronGeometry args={[0.5, 0]} />
       <meshStandardMaterial color="#4a4f4a" roughness={0.95} metalness={0.05} />
     </mesh>
@@ -282,6 +299,329 @@ function Bush({ position, scale = 1 }) {
         <sphereGeometry args={[0.3, 6, 5]} />
         <meshStandardMaterial color="#162b14" roughness={0.92} />
       </mesh>
+    </group>
+  );
+}
+
+/* ============================================
+   LANDMARK: MOUNTAIN RANGE (between Welcome → Skills)
+   ============================================ */
+function MountainRange({ position }) {
+  return (
+    <group position={position}>
+      {/* Main peak */}
+      <mesh position={[0, 7, 0]}>
+        <coneGeometry args={[8, 14, 6]} />
+        <meshStandardMaterial color="#5a6570" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 13.5, 0]}>
+        <coneGeometry args={[3.5, 3, 6]} />
+        <meshStandardMaterial color="#e8e8f0" roughness={0.7} />
+      </mesh>
+      {/* Left peak */}
+      <mesh position={[-10, 5, 3]}>
+        <coneGeometry args={[6, 10, 6]} />
+        <meshStandardMaterial color="#4e5a63" roughness={0.85} />
+      </mesh>
+      <mesh position={[-10, 9.5, 3]}>
+        <coneGeometry args={[2.5, 2.5, 6]} />
+        <meshStandardMaterial color="#dde0e8" roughness={0.7} />
+      </mesh>
+      {/* Right peak */}
+      <mesh position={[8, 4.5, -4]}>
+        <coneGeometry args={[5.5, 9, 6]} />
+        <meshStandardMaterial color="#556068" roughness={0.85} />
+      </mesh>
+      <mesh position={[8, 8.5, -4]}>
+        <coneGeometry args={[2, 2, 6]} />
+        <meshStandardMaterial color="#d5d8e0" roughness={0.7} />
+      </mesh>
+      {/* Far small peak */}
+      <mesh position={[16, 3.5, 2]}>
+        <coneGeometry args={[4, 7, 5]} />
+        <meshStandardMaterial color="#606a72" roughness={0.9} />
+      </mesh>
+      {/* Foothill boulders */}
+      {[-6, -2, 3, 9].map((xo, i) => (
+        <mesh key={i} position={[xo, 0.4, 6 + i * 1.2]} scale={[1, 0.5, 1]}>
+          <dodecahedronGeometry args={[1.2, 0]} />
+          <meshStandardMaterial color="#5a6055" roughness={0.95} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ============================================
+   LANDMARK: CRYSTAL SHRINE (between Skills → Experience)
+   ============================================ */
+function CrystalShrine({ position }) {
+  const crystalRefs = useRef({});
+
+  useFrame((state) => {
+    const et = state.clock.elapsedTime;
+    Object.values(crystalRefs.current).forEach((mat, i) => {
+      if (mat) {
+        mat.emissiveIntensity = 2.5 + Math.sin(et * 1.2 + i * 0.8) * 1.2;
+      }
+    });
+  });
+
+  const crystals = [
+    { pos: [0, 2.2, 0], scale: [0.5, 1.4, 0.5], color: '#88ddff', rot: 0 },
+    { pos: [-1.2, 1.4, 0.6], scale: [0.35, 1, 0.35], color: '#cc88ff', rot: 0.4 },
+    { pos: [1.1, 1.5, -0.4], scale: [0.4, 1.1, 0.4], color: '#ff88cc', rot: -0.3 },
+    { pos: [-0.7, 0.8, -0.8], scale: [0.28, 0.85, 0.28], color: '#88ffdd', rot: 0.6 },
+    { pos: [0.9, 0.9, 0.7], scale: [0.32, 0.9, 0.32], color: '#ddccff', rot: -0.5 },
+    { pos: [0, 0.5, 1.2], scale: [0.25, 0.7, 0.25], color: '#aaffee', rot: 0.2 },
+    { pos: [-0.5, 0.4, -1], scale: [0.22, 0.65, 0.22], color: '#ffaacc', rot: -0.2 },
+  ];
+
+  return (
+    <group position={position}>
+      {/* Stone platform */}
+      <mesh position={[0, 0.08, 0]}>
+        <cylinderGeometry args={[3.5, 3.8, 0.15, 8]} />
+        <meshStandardMaterial color="#3a3d42" roughness={0.9} metalness={0.1} />
+      </mesh>
+      <mesh position={[0, 0.02, 0]}>
+        <ringGeometry args={[2.8, 3.2, 16]} />
+        <meshStandardMaterial color="#4a4d52" roughness={0.85} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Glowing crystals — double cone for gem shape */}
+      {crystals.map((c, i) => (
+        <group key={i} position={c.pos} rotation={[0, c.rot, 0]}>
+          <mesh scale={c.scale}>
+            <coneGeometry args={[1, 1, 4]} />
+            <meshStandardMaterial
+              ref={(el) => { crystalRefs.current[i] = el; }}
+              color={c.color}
+              emissive={c.color}
+              emissiveIntensity={2.5}
+              transparent
+              opacity={0.92}
+              roughness={0.2}
+              metalness={0.3}
+            />
+          </mesh>
+          <mesh position={[0, -c.scale[1], 0]} scale={c.scale} rotation={[Math.PI, 0, 0]}>
+            <coneGeometry args={[1, 1, 4]} />
+            <meshStandardMaterial
+              color={c.color}
+              emissive={c.color}
+              emissiveIntensity={1.8}
+              transparent
+              opacity={0.85}
+              roughness={0.25}
+              metalness={0.2}
+            />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Central orb */}
+      <mesh position={[0, 3.2, 0]}>
+        <sphereGeometry args={[0.35, 16, 16]} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive="#aaddff"
+          emissiveIntensity={4}
+          transparent
+          opacity={0.9}
+          roughness={0.1}
+        />
+      </mesh>
+
+      <pointLight position={[0, 2.5, 0]} color="#aaddff" intensity={3} distance={20} />
+      <pointLight position={[-1, 1, 1]} color="#cc88ff" intensity={1.5} distance={12} />
+      <pointLight position={[1, 1, -0.5]} color="#ff88cc" intensity={1.5} distance={12} />
+      <Sparkles count={80} scale={8} size={2} speed={0.4} color="#ffffff" opacity={0.7} />
+      <Sparkles count={40} scale={5} size={3} speed={0.6} color="#88ddff" opacity={0.5} />
+    </group>
+  );
+}
+
+/* ============================================
+   LANDMARK: STONE BRIDGE + STREAM (between Experience → Projects)
+   ============================================ */
+function StoneBridge({ position }) {
+  return (
+    <group position={position}>
+      {/* Arch */}
+      <mesh position={[0, 2.2, 0]} rotation={[0, 0, 0]}>
+        <torusGeometry args={[2.5, 0.5, 8, 16, Math.PI]} />
+        <meshStandardMaterial color="#6a6a65" roughness={0.9} />
+      </mesh>
+      {/* Left pillar */}
+      <mesh position={[-2.5, 1, 0]}>
+        <boxGeometry args={[1, 2, 1]} />
+        <meshStandardMaterial color="#5a5a55" roughness={0.92} />
+      </mesh>
+      {/* Right pillar */}
+      <mesh position={[2.5, 1, 0]}>
+        <boxGeometry args={[1, 2, 1]} />
+        <meshStandardMaterial color="#5a5a55" roughness={0.92} />
+      </mesh>
+      {/* Bridge deck */}
+      <mesh position={[0, 3.8, 0]}>
+        <boxGeometry args={[6, 0.3, 2]} />
+        <meshStandardMaterial color="#6e6e66" roughness={0.88} />
+      </mesh>
+      {/* Railings */}
+      {[-1, 0, 1].map((xo, i) => (
+        <group key={i}>
+          <mesh position={[xo * 2, 4.5, 0.9]}>
+            <boxGeometry args={[0.15, 1.2, 0.15]} />
+            <meshStandardMaterial color="#5a5a55" roughness={0.9} />
+          </mesh>
+          <mesh position={[xo * 2, 4.5, -0.9]}>
+            <boxGeometry args={[0.15, 1.2, 0.15]} />
+            <meshStandardMaterial color="#5a5a55" roughness={0.9} />
+          </mesh>
+        </group>
+      ))}
+      {/* Stream under bridge */}
+      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[3, 14]} />
+        <meshStandardMaterial
+          color="#3a7090"
+          emissive="#1a4060"
+          emissiveIntensity={0.1}
+          roughness={0.2}
+          metalness={0.5}
+          transparent
+          opacity={0.6}
+        />
+      </mesh>
+      {/* Vines on arch */}
+      {[[-1.8, 3.5, 0.5], [1.5, 3.2, -0.5], [0, 4.2, 0.4]].map(([vx, vy, vz], i) => (
+        <mesh key={i} position={[vx, vy, vz]}>
+          <sphereGeometry args={[0.3, 6, 6]} />
+          <meshStandardMaterial color="#2a4a20" roughness={0.9} />
+        </mesh>
+      ))}
+
+      <pointLight position={[0, 4, 0]} color="#ddeedd" intensity={1.5} distance={12} />
+    </group>
+  );
+}
+
+/* ============================================
+   LANDMARK: GLOWING MUSHROOM GROVE (between Projects → Contact)
+   ============================================ */
+function MushroomGrove({ position }) {
+  const glowRefs = useRef({});
+
+  useFrame((state) => {
+    const et = state.clock.elapsedTime;
+    Object.entries(glowRefs.current).forEach(([key, mat]) => {
+      if (mat) {
+        mat.emissiveIntensity = 1.5 + Math.sin(et * 1.5 + Number(key) * 1.2) * 0.8;
+      }
+    });
+  });
+
+  const mushrooms = [
+    { pos: [0, 0, 0], s: 1.0, color: '#44ddaa' },
+    { pos: [2, 0, 1.5], s: 0.7, color: '#66eebb' },
+    { pos: [-1.5, 0, 2], s: 0.85, color: '#55ccff' },
+    { pos: [3, 0, -1], s: 0.6, color: '#88ddcc' },
+    { pos: [-2.5, 0, -0.5], s: 0.9, color: '#77eedd' },
+    { pos: [0.5, 0, -2.5], s: 0.5, color: '#55ddbb' },
+    { pos: [-3, 0, 3], s: 0.75, color: '#44ccaa' },
+    { pos: [1.5, 0, 3.5], s: 0.55, color: '#66ddff' },
+  ];
+
+  return (
+    <group position={position}>
+      {mushrooms.map((m, i) => (
+        <group key={i} position={m.pos} scale={m.s}>
+          {/* Stem */}
+          <mesh position={[0, 0.5, 0]}>
+            <cylinderGeometry args={[0.12, 0.18, 1, 6]} />
+            <meshStandardMaterial color="#e8e0d0" roughness={0.8} />
+          </mesh>
+          {/* Cap */}
+          <mesh position={[0, 1.1, 0]}>
+            <sphereGeometry args={[0.5, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
+            <meshStandardMaterial
+              ref={(el) => { glowRefs.current[i] = el; }}
+              color={m.color}
+              emissive={m.color}
+              emissiveIntensity={1.5}
+              transparent
+              opacity={0.85}
+            />
+          </mesh>
+          {/* Spots */}
+          {[[-0.15, 1.25, 0.2], [0.2, 1.3, -0.1], [-0.05, 1.35, -0.2]].map(([sx, sy, sz], si) => (
+            <mesh key={si} position={[sx, sy, sz]}>
+              <sphereGeometry args={[0.06, 5, 5]} />
+              <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} />
+            </mesh>
+          ))}
+          <pointLight position={[0, 1.2, 0]} color={m.color} intensity={0.8} distance={4} />
+        </group>
+      ))}
+      <Sparkles count={50} scale={8} size={2.5} speed={0.5} color="#44ddaa" opacity={0.6} />
+    </group>
+  );
+}
+
+/* ============================================
+   LANDMARK: ANCIENT RUINS (between Contact → Welcome, closing loop)
+   ============================================ */
+function AncientRuins({ position }) {
+  return (
+    <group position={position}>
+      {/* Standing columns */}
+      {[[-3, 0, -2], [3, 0, -2], [-3, 0, 2], [3, 0, 2], [0, 0, -3.5]].map(([cx, cy, cz], i) => {
+        const height = 3 + (i % 3) * 1.5;
+        return (
+          <group key={i} position={[cx, cy, cz]}>
+            <mesh position={[0, height / 2, 0]}>
+              <cylinderGeometry args={[0.3, 0.4, height, 8]} />
+              <meshStandardMaterial color="#b0a898" roughness={0.85} />
+            </mesh>
+            {/* Capital */}
+            <mesh position={[0, height, 0]}>
+              <boxGeometry args={[0.9, 0.25, 0.9]} />
+              <meshStandardMaterial color="#c0b8a8" roughness={0.8} />
+            </mesh>
+            {/* Base */}
+            <mesh position={[0, 0.1, 0]}>
+              <cylinderGeometry args={[0.5, 0.55, 0.2, 8]} />
+              <meshStandardMaterial color="#a09888" roughness={0.9} />
+            </mesh>
+          </group>
+        );
+      })}
+      {/* Fallen column */}
+      <mesh position={[1.5, 0.3, 0]} rotation={[0, 0.4, Math.PI / 2]}>
+        <cylinderGeometry args={[0.3, 0.35, 3.5, 8]} />
+        <meshStandardMaterial color="#a89888" roughness={0.88} />
+      </mesh>
+      {/* Broken arch fragment */}
+      <mesh position={[-1, 3, -2]} rotation={[0, 0.3, 0.15]}>
+        <boxGeometry args={[4.5, 0.5, 1]} />
+        <meshStandardMaterial color="#b8b0a0" roughness={0.85} />
+      </mesh>
+      {/* Floor tiles (broken) */}
+      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0.1]}>
+        <planeGeometry args={[7, 7]} />
+        <meshStandardMaterial color="#908878" roughness={0.95} transparent opacity={0.6} />
+      </mesh>
+      {/* Moss / vines */}
+      {[[-3, 1.5, -2], [3, 2, 2], [-3, 2.5, 2], [0, 1, -3.5]].map(([vx, vy, vz], i) => (
+        <mesh key={i} position={[vx, vy, vz]}>
+          <sphereGeometry args={[0.35 + (i % 2) * 0.15, 6, 6]} />
+          <meshStandardMaterial color="#2a4a22" roughness={0.9} />
+        </mesh>
+      ))}
+
+      <pointLight position={[0, 3, 0]} color="#e8d8b8" intensity={1.5} distance={15} />
+      <Sparkles count={25} scale={8} size={1.5} speed={0.2} color="#d4c8a0" opacity={0.35} />
     </group>
   );
 }
@@ -561,6 +901,13 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
       <DirtPath />
       <Forest />
       <Fireflies />
+
+      {/* === SCENIC LANDMARKS === */}
+      <MountainRange position={LANDMARK_POSITIONS.mountains} />
+      <CrystalShrine position={LANDMARK_POSITIONS.waterfall} />
+      <StoneBridge position={LANDMARK_POSITIONS.bridge} />
+      <MushroomGrove position={LANDMARK_POSITIONS.mushrooms} />
+      <AncientRuins position={LANDMARK_POSITIONS.ruins} />
 
       {/* Global sparkles for depth */}
       <Sparkles count={80} scale={50} size={1.5} speed={0.2} color="#ffcc77" opacity={0.25} />

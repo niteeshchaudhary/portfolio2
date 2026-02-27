@@ -1,9 +1,16 @@
 import { useState, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 
+const PROFILE_IMAGE_URL = 'https://avatars.githubusercontent.com/u/66108270?v=4';
+
 function HeroSection() {
   return (
     <div className="section-content hero-section">
+      <img
+        src={PROFILE_IMAGE_URL}
+        alt="Niteesh Kamal Chaudhary"
+        className="hero-profile-pic"
+      />
       <div className="hero-greeting">Hello, I am</div>
       <h1 className="hero-name">
         <span className="gradient-text">Niteesh Kamal Chaudhary</span>
@@ -15,9 +22,12 @@ function HeroSection() {
         <span className="role-tag">Android Developer</span>
       </div>
       <p className="hero-desc">
-        Welcome, adventurer! You have opened the first scroll.
-        Close this scroll and use the mouse wheel to guide the Prince
-        to the next platform. Each scroll holds a chapter of my journey.
+        Hello! I am an aspiring software engineer who enjoys solving puzzles and
+        problems. I have strong technical skills and an academic background in
+        engineering, coding and development. I'm interested in internship roles
+        in software development, full stack development and game development.
+        Please feel free to get in touch with me via email at{' '}
+        <a href="mailto:nkchaudhary00@gmail.com" className="hero-email-link">nkchaudhary00@gmail.com</a>.
       </p>
     </div>
   );
