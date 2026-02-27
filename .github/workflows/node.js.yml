@@ -40,4 +40,4 @@ jobs:
       with:
           personal_token: ${{ secrets.PAT}}
           publish_dir: ./dist
-          publish_branch: gh-pages
+          publish_branch: gh-pages-3d
