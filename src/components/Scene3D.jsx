@@ -40,11 +40,11 @@ function getLandmarkPos(tMid, sideOffset) {
 }
 
 const LANDMARK_POSITIONS = {
-  mountains:  getLandmarkPos(0.1, -18),
-  waterfall:  getLandmarkPos(0.3, 14),
-  bridge:     getLandmarkPos(0.5, -12),
-  mushrooms:  getLandmarkPos(0.7, 10),
-  ruins:      getLandmarkPos(0.9, -14),
+  mountains: getLandmarkPos(0.1, -18),
+  waterfall: getLandmarkPos(0.3, 14),
+  bridge: getLandmarkPos(0.5, -12),
+  mushrooms: getLandmarkPos(0.7, 10),
+  ruins: getLandmarkPos(0.9, -14),
 };
 
 /* ============================================
@@ -810,8 +810,15 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 
   useFrame((state) => {
     if (!isContentOpen) {
-      smoothProgress.current += (scrollTarget.current - smoothProgress.current) * 0.07;
-      if (Math.abs(scrollTarget.current - smoothProgress.current) < 0.0005) {
+      const diff = scrollTarget.current - smoothProgress.current;
+      let step = diff * 0.05;
+      const maxSpeed = 0.0025;
+      if (Math.abs(step) > maxSpeed) {
+        step = Math.sign(step) * maxSpeed;
+      }
+      smoothProgress.current += step;
+
+      if (Math.abs(scrollTarget.current - smoothProgress.current) < 0.0001) {
         smoothProgress.current = scrollTarget.current;
       }
     }
@@ -845,14 +852,18 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 
     // Look direction — tangent of the path
     const tangent = PATH_CURVE.getTangentAt(progress);
-    const targetLook = new THREE.Vector3(
-      pos.x + tangent.x * 8,
-      pos.y + eyeHeight + tangent.y * 8,
-      pos.z + tangent.z * 8,
-    );
 
-    lookDir.current.lerp(targetLook, 0.04);
-    camera.lookAt(lookDir.current);
+    // Lerp the direction vector instead of an absolute world position
+    // This prevents the camera from overtaking its look target and flipping backwards
+    lookDir.current.lerp(tangent, 0.08);
+    lookDir.current.normalize();
+
+    const targetLook = new THREE.Vector3(
+      pos.x + lookDir.current.x * 8,
+      pos.y + eyeHeight + lookDir.current.y * 8,
+      pos.z + lookDir.current.z * 8
+    );
+    camera.lookAt(targetLook);
 
     // FOV
     const targetFov = 72 + bobIntensity * 8;

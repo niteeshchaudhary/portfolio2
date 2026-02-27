@@ -93,32 +93,35 @@ export default function App() {
     const fullyUnlocked = () => unlockedRef.current >= TOTAL_SECTIONS;
     const maxProgress = () => Math.min(unlockedRef.current / TOTAL_SECTIONS, 1);
 
-    const applyDelta = (delta) => {
+    const applyDelta = (rawDelta) => {
+      // Limit the delta to prevent runaway scrolling and normalize speed
+      const cappedDelta = Math.sign(rawDelta) * Math.min(Math.abs(rawDelta), 0.02);
+
       if (fullyUnlocked()) {
-        scrollTarget.current += delta;
+        scrollTarget.current += cappedDelta;
       } else {
-        scrollTarget.current = clamp(scrollTarget.current + delta, 0, maxProgress());
+        scrollTarget.current = clamp(scrollTarget.current + cappedDelta, 0, maxProgress());
       }
     };
 
     const onWheel = (e) => {
       e.preventDefault();
-      applyDelta(e.deltaY * 0.0004);
+      applyDelta(e.deltaY * 0.001);
     };
     const onTouchStart = (e) => { touchStartY.current = e.touches[0].clientY; };
     const onTouchMove = (e) => {
       e.preventDefault();
       const d = touchStartY.current - e.touches[0].clientY;
       touchStartY.current = e.touches[0].clientY;
-      applyDelta(d * 0.002);
+      applyDelta(d * 0.005);
     };
     const onKeyDown = (e) => {
       if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
-        applyDelta(0.06);
+        applyDelta(0.04);
       } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        applyDelta(-0.06);
+        applyDelta(-0.04);
       }
     };
 
