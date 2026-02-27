@@ -314,12 +314,12 @@ function Forest() {
       return Math.sqrt(min);
     }
 
-    // Generate trees — avoid the path (min 3.5 units away)
+    // Generate trees — avoid the wide path (min 5.5 units away)
     for (let i = 0; i < 80; i++) {
       const x = (rng() - 0.5) * 80;
       const z = (rng() - 0.5) * 80;
       const dist = distToPath(x, z);
-      if (dist < 3.5) continue;
+      if (dist < 5.5) continue;
       const s = 0.7 + rng() * 0.8;
       const isPine = rng() > 0.35;
       treeList.push({ x, z, scale: s, isPine, key: `tree-${i}` });
@@ -330,7 +330,7 @@ function Forest() {
       const x = (rng() - 0.5) * 70;
       const z = (rng() - 0.5) * 70;
       const dist = distToPath(x, z);
-      if (dist < 2) continue;
+      if (dist < 4.5) continue;
       rockList.push({ x, z, scale: 0.4 + rng() * 0.8, rotation: rng() * Math.PI * 2, key: `rock-${i}` });
     }
 
@@ -339,7 +339,7 @@ function Forest() {
       const x = (rng() - 0.5) * 70;
       const z = (rng() - 0.5) * 70;
       const dist = distToPath(x, z);
-      if (dist < 1.5 || dist > 8) continue;
+      if (dist < 4.0 || dist > 10) continue;
       bushList.push({ x, z, scale: 0.6 + rng() * 0.7, key: `bush-${i}` });
     }
 
@@ -364,30 +364,47 @@ function Forest() {
 }
 
 /* ============================================
-   DIRT PATH — flat tube along the spline
+   DIRT PATH — flat ribbon along the spline
    ============================================ */
 function DirtPath() {
   const geometry = useMemo(() => {
-    const shape = new THREE.Shape();
-    shape.moveTo(-1.2, -0.02);
-    shape.lineTo(1.2, -0.02);
-    shape.lineTo(1.2, 0.02);
-    shape.lineTo(-1.2, 0.02);
-    shape.closePath();
+    const segments = 400;
+    const halfWidth = 3.0;
+    const positions = [];
+    const indices = [];
+    const uvs = [];
+    const up = new THREE.Vector3(0, 1, 0);
 
-    const pts = PATH_CURVE.getPoints(300);
-    const curve2 = new THREE.CatmullRomCurve3(pts, true);
-    const extrudeSettings = {
-      steps: 300,
-      bevelEnabled: false,
-      extrudePath: curve2,
-    };
-    return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const point = PATH_CURVE.getPointAt(t);
+      const tangent = PATH_CURVE.getTangentAt(t);
+      const perp = new THREE.Vector3().crossVectors(tangent, up).normalize();
+
+      positions.push(
+        point.x - perp.x * halfWidth, 0.02, point.z - perp.z * halfWidth,
+        point.x + perp.x * halfWidth, 0.02, point.z + perp.z * halfWidth,
+      );
+      uvs.push(0, t, 1, t);
+
+      if (i < segments) {
+        const base = i * 2;
+        indices.push(base, base + 2, base + 1);
+        indices.push(base + 1, base + 2, base + 3);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
   }, []);
 
   return (
-    <mesh geometry={geometry} position={[0, 0.01, 0]}>
-      <meshStandardMaterial color="#5c4a32" roughness={0.95} />
+    <mesh geometry={geometry}>
+      <meshStandardMaterial color="#6b5540" roughness={0.9} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -399,7 +416,7 @@ function Ground() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
       <planeGeometry args={[200, 200]} />
-      <meshStandardMaterial color="#1a2e1a" roughness={1} />
+      <meshStandardMaterial color="#2a3a28" roughness={1} />
     </mesh>
   );
 }
@@ -448,13 +465,18 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 
   const lookDir = useRef(new THREE.Vector3(0, 0, -1));
   const shakeAmount = useRef(0);
+  const stableFrames = useRef(0);
+  const candidateSection = useRef(0);
 
   useFrame((state) => {
     if (!isContentOpen) {
-      smoothProgress.current += (scrollTarget.current - smoothProgress.current) * 0.03;
+      smoothProgress.current += (scrollTarget.current - smoothProgress.current) * 0.07;
+      if (Math.abs(scrollTarget.current - smoothProgress.current) < 0.0005) {
+        smoothProgress.current = scrollTarget.current;
+      }
     }
 
-    const progress = smoothProgress.current % 1;
+    const progress = ((smoothProgress.current % 1) + 1) % 1;
     const et = state.clock.elapsedTime;
 
     // Position on path
@@ -497,10 +519,19 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
     camera.fov += (targetFov - camera.fov) * 0.04;
     camera.updateProjectionMatrix();
 
-    // Section detection
-    const sp = progress * TOTAL_SECTIONS;
-    const section = Math.floor(sp) % TOTAL_SECTIONS;
-    if (section !== prevSection.current) {
+    // Section detection — use round so the section triggers at the midpoint,
+    // not at the exact boundary (which smoothProgress may never precisely reach)
+    const section = Math.round(progress * TOTAL_SECTIONS) % TOTAL_SECTIONS;
+
+    if (section === candidateSection.current) {
+      stableFrames.current++;
+    } else {
+      candidateSection.current = section;
+      stableFrames.current = 0;
+    }
+
+    // Only fire after section is stable for 12 frames (~200ms at 60fps)
+    if (stableFrames.current === 12 && section !== prevSection.current) {
       prevSection.current = section;
       setActiveSection(section);
       onSectionChange(section);
@@ -510,13 +541,20 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 
   return (
     <>
-      {/* === LIGHTING === */}
-      <ambientLight intensity={0.08} color="#8090b0" />
-      <directionalLight position={[10, 40, 5]} intensity={0.35} color="#b0c0e0" />
-      <hemisphereLight args={['#1a2040', '#0a150a', 0.2]} />
+      {/* === DUSKY LIGHTING === */}
+      <ambientLight intensity={0.32} color="#c4b8a8" />
+      <hemisphereLight args={['#87a0c0', '#2a3528', 0.45]} />
+      {/* Sun direction (high and to the side) */}
+      <directionalLight position={[25, 55, -20]} intensity={0.85} color="#ffeed8" castShadow />
+      <directionalLight position={[-15, 25, -15]} intensity={0.2} color="#b8c8e0" />
+      {/* Fill so path and forest floor are visible */}
+      <pointLight position={[0, 12, -30]} intensity={0.4} color="#e8e0d0" distance={80} />
 
-      {/* Moonlight backlight */}
-      <directionalLight position={[-20, 30, -20]} intensity={0.15} color="#6070a0" />
+      {/* === SUN IN SKY === */}
+      <mesh position={[28, 52, -25]}>
+        <sphereGeometry args={[8, 24, 24]} />
+        <meshBasicMaterial color="#ffdd99" fog={false} />
+      </mesh>
 
       {/* === ENVIRONMENT === */}
       <Ground />
@@ -525,7 +563,7 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
       <Fireflies />
 
       {/* Global sparkles for depth */}
-      <Sparkles count={100} scale={50} size={2} speed={0.3} color="#88aa44" opacity={0.3} />
+      <Sparkles count={80} scale={50} size={1.5} speed={0.2} color="#ffcc77" opacity={0.25} />
 
       {/* === SCROLL CLEARINGS === */}
       {SCROLL_POSITIONS.map((pos, i) => (
@@ -553,8 +591,8 @@ export default function Scene3D({ scrollTarget, onSectionChange, isContentOpen }
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       dpr={[1, 1.5]}
     >
-      <fog attach="fog" args={['#0a150a', 8, 45]} />
-      <color attach="background" args={['#0a150a']} />
+      <fog attach="fog" args={['#4a5568', 15, 55]} />
+      <color attach="background" args={['#3d4a5c']} />
       <ForestScene scrollTarget={scrollTarget} onSectionChange={onSectionChange} isContentOpen={isContentOpen} />
     </Canvas>
   );

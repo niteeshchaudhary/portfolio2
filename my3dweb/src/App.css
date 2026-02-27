@@ -1231,10 +1231,9 @@
   z-index: 70;
   font-size: 0.7rem;
   letter-spacing: 1.5px;
-  color: rgba(255, 215, 0, 0.4);
+  color: rgba(255, 215, 0, 0.75);
   font-family: 'Space Grotesk', sans-serif;
   text-transform: uppercase;
-  animation: pulse 2s ease infinite;
 }
 
 /* Forest vignette enhancement */

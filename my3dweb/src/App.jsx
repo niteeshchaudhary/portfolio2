@@ -11,23 +11,21 @@ function clamp(val, min, max) {
 }
 
 const SECTION_NAMES = ['Welcome', 'Skills', 'Experience', 'Projects', 'Contact'];
+const TOTAL_SECTIONS = 5;
 
 function GameHUD({ section, isContentOpen, is3D }) {
   if (!is3D) return null;
   return (
     <div className="game-hud">
-      {/* Crosshair — hidden when content is open */}
       {!isContentOpen && <div className="crosshair" />}
 
-      {/* Objective — top left */}
       {!isContentOpen && (
         <div className="hud-objective">
           <span className="hud-label">OBJECTIVE</span>
-          <span className="hud-value">{SECTION_NAMES[section]}</span>
+          <span className="hud-value">{SECTION_NAMES[section] || ''}</span>
         </div>
       )}
 
-      {/* Progress tracker — bottom left */}
       <div className={`hud-progress ${isContentOpen ? 'dim' : ''}`}>
         {SECTION_NAMES.map((name, i) => (
           <div key={i} className={`hud-step ${section >= i ? 'reached' : ''} ${section === i ? 'current' : ''}`}>
@@ -36,13 +34,6 @@ function GameHUD({ section, isContentOpen, is3D }) {
           </div>
         ))}
       </div>
-
-      {/* Scroll prompt — center bottom, when on block and content not open */}
-      {!isContentOpen && (
-        <div className="hud-prompt">
-          <span>Scroll picked up — opening...</span>
-        </div>
-      )}
     </div>
   );
 }
@@ -57,8 +48,6 @@ function ViewToggle({ is3D, onToggle }) {
   );
 }
 
-const TOTAL_SECTIONS = 5;
-
 export default function App() {
   const { skills, projects, experience, loading } = useFirebaseData();
   const [is3D, setIs3D] = useState(true);
@@ -68,55 +57,68 @@ export default function App() {
   const scrollTarget = useRef(0);
   const touchStartY = useRef(0);
   const openTimerRef = useRef(null);
-
-  // Gating: tracks how far forward the player is allowed to go.
-  // After closing content on section N, the next section (N+1) is unlocked.
   const unlockedRef = useRef(0);
+  const initialOpenDone = useRef(false);
 
   const handleCloseContent = useCallback(() => {
     setIsContentOpen(false);
     unlockedRef.current = Math.max(unlockedRef.current, activeSection + 1);
   }, [activeSection]);
 
-  // Auto-open content when player lands on a new section
+  // Open initial section after loading completes
   useEffect(() => {
+    if (showLoading || loading || initialOpenDone.current) return;
+    initialOpenDone.current = true;
+    openTimerRef.current = setTimeout(() => {
+      setIsContentOpen(true);
+    }, 800);
+    return () => clearTimeout(openTimerRef.current);
+  }, [showLoading, loading]);
+
+  // Auto-open content when activeSection changes (after the initial one)
+  useEffect(() => {
+    if (!initialOpenDone.current) return;
     setIsContentOpen(false);
     clearTimeout(openTimerRef.current);
     openTimerRef.current = setTimeout(() => {
       setIsContentOpen(true);
-    }, 900);
+    }, 500);
     return () => clearTimeout(openTimerRef.current);
   }, [activeSection]);
 
-  // Scroll input — only when content is CLOSED and in 3D mode.
-  // Forward progress is clamped to the next unlocked section boundary.
+  // Scroll input — only when content is CLOSED and in 3D mode
   useEffect(() => {
     if (!is3D || isContentOpen) return;
 
+    const fullyUnlocked = () => unlockedRef.current >= TOTAL_SECTIONS;
     const maxProgress = () => Math.min(unlockedRef.current / TOTAL_SECTIONS, 1);
+
+    const applyDelta = (delta) => {
+      if (fullyUnlocked()) {
+        scrollTarget.current += delta;
+      } else {
+        scrollTarget.current = clamp(scrollTarget.current + delta, 0, maxProgress());
+      }
+    };
 
     const onWheel = (e) => {
       e.preventDefault();
-      scrollTarget.current = clamp(
-        scrollTarget.current + e.deltaY * 0.0004,
-        0,
-        maxProgress(),
-      );
+      applyDelta(e.deltaY * 0.0004);
     };
     const onTouchStart = (e) => { touchStartY.current = e.touches[0].clientY; };
     const onTouchMove = (e) => {
       e.preventDefault();
       const d = touchStartY.current - e.touches[0].clientY;
       touchStartY.current = e.touches[0].clientY;
-      scrollTarget.current = clamp(scrollTarget.current + d * 0.002, 0, maxProgress());
+      applyDelta(d * 0.002);
     };
     const onKeyDown = (e) => {
-      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      if (e.key === 'ArrowUp' || e.key === 'PageUp') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current + 0.06, 0, maxProgress());
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        applyDelta(0.06);
+      } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
         e.preventDefault();
-        scrollTarget.current = clamp(scrollTarget.current - 0.06, 0, maxProgress());
+        applyDelta(-0.06);
       }
     };
 
