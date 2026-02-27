@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ "3d_portfolio" ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
