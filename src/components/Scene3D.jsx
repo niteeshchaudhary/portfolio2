@@ -810,9 +810,18 @@ function ForestScene({ scrollTarget, onSectionChange, isContentOpen }) {
 
   useFrame((state) => {
     if (!isContentOpen) {
+      // Leash the target so it can't run away from the current position
+      // This prevents the camera from "storing" speed and coasting forever
+      const maxLeash = 0.08;
+      if (scrollTarget.current > smoothProgress.current + maxLeash) {
+        scrollTarget.current = smoothProgress.current + maxLeash;
+      } else if (scrollTarget.current < smoothProgress.current - maxLeash) {
+        scrollTarget.current = smoothProgress.current - maxLeash;
+      }
+
       const diff = scrollTarget.current - smoothProgress.current;
       let step = diff * 0.05;
-      const maxSpeed = 0.0025;
+      const maxSpeed = 0.003; // slightly increased base speed for responsiveness
       if (Math.abs(step) > maxSpeed) {
         step = Math.sign(step) * maxSpeed;
       }
