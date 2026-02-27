@@ -285,6 +285,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 80px 24px 60px;
+  position: relative;
+  z-index: 10;
 }
 
 .content-scroll-area::-webkit-scrollbar {

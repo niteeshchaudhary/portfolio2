@@ -51,7 +51,7 @@ function SkillsSection({ skills }) {
               <div
                 className="skill-fill"
                 style={{
-                  width: `${skill.percentage}%`,
+                  '--pct': `${skill.percentage}%`,
                   animationDelay: `${i * 0.1 + 0.3}s`,
                 }}
               />
@@ -168,9 +168,16 @@ function ContactSection() {
   );
 }
 
+import CustomCursor from './CustomCursor';
+import ParallaxBackground from './ParallaxBackground';
+
 export default function ContentOverlay({ section, isOpen, onClose, skills, projects, experience }) {
+  const scrollRef = useRef(null);
+
   return (
     <div className={`content-fullpage ${isOpen ? 'open' : ''}`}>
+      {isOpen && <CustomCursor />}
+      {isOpen && <ParallaxBackground containerRef={scrollRef} />}
       {/* Circular close button — top center */}
       <button className="content-close" onClick={onClose} aria-label="Close scroll">
         <span className="close-icon">✕</span>
@@ -184,7 +191,7 @@ export default function ContentOverlay({ section, isOpen, onClose, skills, proje
       )}
 
       {/* Scrollable content area */}
-      <div className="content-scroll-area">
+      <div className="content-scroll-area" ref={scrollRef}>
         <div className="content-inner">
           {section === 0 && <HeroSection />}
           {section === 1 && <SkillsSection skills={skills} />}
